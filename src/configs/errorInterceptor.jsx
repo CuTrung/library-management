@@ -9,7 +9,7 @@ const errorInterceptor = (error) => {
     // all the error responses
     switch (error.response.status) {
         case 400:
-            toast.error(error.response.status, error.message)
+            // toast.error(error.response.status, error.message)
             console.log('📡 API | Nothing to display', 'Data Not Found')
             break
 
@@ -19,17 +19,17 @@ const errorInterceptor = (error) => {
             break
 
         case 403:
-            toast.error(error.response.status, error.message)
+            // toast.error(error.response.status, error.message)
             console.log('📡 API | Access denied', 'Data Not Found')
             break
 
         case 404:
-            toast.error("Some thing wrongs on client...")
+            // toast.error("Some thing wrongs on client...")
             console.log('📡 API | Dataset not found', 'Data Not Found')
             break
 
         case 422:
-            toast.error(error.response.status, error.message, error.response.data.detail)
+            // toast.error(error.response.status, error.message, error.response.data.detail)
             console.log('📡 API | Validation error', 'Unprocessable Content')
             break
 
