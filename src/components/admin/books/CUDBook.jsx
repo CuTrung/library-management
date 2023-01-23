@@ -65,7 +65,7 @@ const CUDBook = (props) => {
         }
     }
 
-    function clearForm() {
+    function handleClearForm() {
         document.getElementById('upsertForm').reset();
         setFileName(null);
         setBookUpdate({});
@@ -103,7 +103,7 @@ const CUDBook = (props) => {
 
         if (data.EC === 0) {
             listBooksRef.current.fetchListBooks();
-            clearForm();
+            handleClearForm();
         }
 
     }
@@ -229,7 +229,7 @@ const CUDBook = (props) => {
                 </span>
 
                 <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'>{upsertForm.buttonContent}</Button>
-                <Button onClick={clearForm} className={`btn-${upsertForm.supportButtonColor} me-3`} type='button'>{upsertForm.supportButtonContent}</Button>
+                <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor} me-3`} type='button'>{upsertForm.supportButtonContent}</Button>
             </form>
 
             <ListBooks

@@ -1,0 +1,24 @@
+.formLogin {
+    .eye{
+        cursor: pointer;
+    }
+
+    .forget {
+        text-decoration: none;
+    }
+
+    .goHome {
+        a {
+            color          : rgb(70, 65, 65);
+            text-decoration: none;
+
+            &:hover {
+                color: #36d7b7
+            }
+        }
+
+
+    }
+
+    
+}

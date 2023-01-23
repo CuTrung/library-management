@@ -7,7 +7,6 @@ import { fetchData } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
 import '../../../assets/scss/admin/categories/CUDCategory.scss';
-import { FcUpload } from "react-icons/fc";
 
 
 
@@ -17,6 +16,7 @@ const CUDCategory = (props) => {
     const listCategoriesRef = useRef();
 
     const name = useRef("");
+    const isBorrowed = useRef("");
 
     const [categoryUpdate, setCategoryUpdate] = useState({});
     const upsertForm = useMemo(() => {
@@ -49,7 +49,7 @@ const CUDCategory = (props) => {
         }
     }
 
-    function clearForm() {
+    function handleClearForm() {
         document.getElementById('upsertForm').reset();
         setCategoryUpdate({});
     }
@@ -63,22 +63,15 @@ const CUDCategory = (props) => {
         // if (!isValid) return;
 
         // Create with form
-        let isBorrowed = null;
-        for (const item of document.querySelectorAll('[name="isBorrowed"]')) {
-            if (item.checked) {
-                isBorrowed = item.value;
-            }
-        }
-
         let data = await fetchData('POST', 'api/categories', {
             name: name.current.value,
-            isBorrowed: isBorrowed,
+            isBorrowed: isBorrowed.current.checked ? '0' : '1',
             id: categoryUpdate.id,
         })
 
         if (data.EC === 0) {
             listCategoriesRef.current.fetchListCategories();
-            clearForm();
+            handleClearForm();
         }
 
     }
@@ -97,14 +90,6 @@ const CUDCategory = (props) => {
         }
     }
 
-    function checkedCategoriesUpdate() {
-        for (const item of document.querySelectorAll('[name="isBorrowed"]')) {
-            if (+item.value === +categoryUpdate.isBorrowed) {
-                item.checked = true;
-            }
-        }
-    }
-
     useEffect(() => {
         getCategories();
     }, [])
@@ -112,7 +97,7 @@ const CUDCategory = (props) => {
     useEffect(() => {
         if (!_.isEmpty(categoryUpdate)) {
             name.current.value = categoryUpdate.name;
-            checkedCategoriesUpdate();
+            isBorrowed.current.checked = categoryUpdate.isBorrowed === 1 ? false : true;
         }
     }, [categoryUpdate])
 
@@ -122,39 +107,28 @@ const CUDCategory = (props) => {
 
                 <h3 className='my-3'>{upsertForm.header}</h3>
 
-                <span className='d-flex gap-2'>
+                <span className='d-flex gap-3'>
                     <FloatingLabel
                         controlId="floatingInput"
                         label="Name"
-                        className="mb-3 w-50"
+                        className="mb-3 w-75"
                     >
                         <Form.Control
                             ref={name} name='name' type="text" placeholder="name@example.com"
                             onChange={(e) => handleOnChange(e)} />
                     </FloatingLabel>
 
-                    <div className='border border-2 rounded px-2 mb-3 w-50 pt-3'>
-                        <div className='d-flex justify-content-evenly gap-3 flex-wrap mx-4 '>
-                            <Form.Check
-                                defaultChecked
-                                name='isBorrowed'
-                                value={'1'}
-                                type={'radio'}
-                                label={'can borrowed'}
-                            />
-                            <Form.Check
-                                name='isBorrowed'
-                                value={'0'}
-                                type={'radio'}
-                                label={`can't borrowed`}
-                            />
-
-                        </div>
-                    </div>
+                    <Form.Check
+                        className='pt-3'
+                        ref={isBorrowed}
+                        name='isBorrowed'
+                        type={'checkbox'}
+                        label={`can't borrowed`}
+                    />
                 </span>
 
                 <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'>{upsertForm.buttonContent}</Button>
-                <Button onClick={clearForm} className={`btn-${upsertForm.supportButtonColor} me-3`} type='button'>{upsertForm.supportButtonContent}</Button>
+                <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor} me-3`} type='button'>{upsertForm.supportButtonContent}</Button>
             </form>
 
             <ListCategories
