@@ -56,6 +56,18 @@ const getSecondsCurrent = () => {
     return new Date().getHours() * 3600 + new Date().getMinutes() * 60 + new Date().getSeconds();
 }
 
+const getCurrentDate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1; // Months start at 0!
+    let dd = today.getDate();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+
+    return dd + '/' + mm + '/' + yyyy;
+}
+
 const $ = (classOrId) => {
     return document.querySelector(classOrId);
 }
@@ -66,5 +78,5 @@ const $$ = (classOrId) => {
 
 export {
     fetchData, currencyVND, removeDiacritics, sortList, $, $$,
-    convertTimeStringToSecond, getSecondsCurrent
+    convertTimeStringToSecond, getSecondsCurrent, getCurrentDate
 }

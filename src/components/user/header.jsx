@@ -6,21 +6,17 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { fetchData } from '../../utils/myUtils';
 import CartBooksDetails from './library/details/cartBooksDetails';
+import { useMemo } from 'react';
+import { ACTION, GlobalContext } from '../../hooks/globalContext';
+import { useContext } from 'react';
 
 const Header = (props) => {
-
-    const { state, pathname } = useLocation();
-
 
     const [listCategories, setListCategories] = useState([]);
     const navigate = useNavigate();
 
-    async function getCategories() {
-        let data = await fetchData('GET', `api/categories`)
-        if (data.EC === 0) {
-            setListCategories(data.DT);
-        }
-    }
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
+
 
     async function handleCategory(category) {
         let data = await fetchData('GET', `api/books/${category.id}`);
@@ -30,8 +26,12 @@ const Header = (props) => {
     }
 
     useEffect(() => {
-        getCategories();
+
     }, [])
+
+    console.log(">>> Check data", stateGlobal);
+
+
 
     return (
         <>
@@ -49,8 +49,8 @@ const Header = (props) => {
                                 id="nav-dropdown-dark-example"
                                 title="Category"
                             >
-                                {listCategories.length > 0 &&
-                                    listCategories.map((category, index) => {
+                                {stateGlobal?.categories?.length > 0 &&
+                                    stateGlobal?.categories?.map((category, index) => {
                                         return (
                                             <NavDropdown.Item key={`category-${index}`} onClick={() => handleCategory(category)}>
                                                 {category.name}
@@ -60,17 +60,21 @@ const Header = (props) => {
 
                             </NavDropdown>
                         </Nav>
-                        {/* <Nav>
-                            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                                <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.1">Logout</NavDropdown.Item>
-                            </NavDropdown>
-                        </Nav> */}
 
-                        {/* <NavLink className='nav-link' to="/login">Login</NavLink> */}
+                        {stateGlobal.user ?
+                            <>
+                                <CartBooksDetails />
 
-
-                        <CartBooksDetails />
+                                <Nav className='ms-3'>
+                                    <NavDropdown title={`Welcome ${stateGlobal.user.fullName}`} id="basic-nav-dropdown">
+                                        <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
+                                        <NavDropdown.Item href="#action/3.1">Logout</NavDropdown.Item>
+                                    </NavDropdown>
+                                </Nav>
+                            </>
+                            :
+                            <NavLink className='nav-link' to="/login">Login</NavLink>
+                        }
 
                     </Navbar.Collapse>
                 </Container>

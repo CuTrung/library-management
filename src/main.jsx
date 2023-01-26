@@ -16,35 +16,29 @@ import Login from './components/both/login';
 import IndexLibrary from './components/user/library/indexLibrary';
 import IndexDetails from './components/user/library/details/indexDetails';
 import HomeLibrary from './components/user/library/homeLibrary';
-import IndexStudents from './components/admin/students/indexStudents';
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  // <React.StrictMode>
+  //<React.StrictMode>
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />}>
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/about" element={<About />} />
+
         <Route path='/' element={<IndexLibrary />} >
           <Route index element={<HomeLibrary />} />
           <Route path="/details/:categoryName" element={<IndexDetails />} />
         </Route>
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/about" element={<About />} />
-
         <Route path="/admin" element={<Admin />}>
-          <Route path="books" element={<IndexBooks />}>
-
-          </Route>
-          <Route path="categories" element={<IndexCategories />}>
-
-          </Route>
-          <Route path="students" element={<IndexStudents />}>
-
-          </Route>
+          <Route path="books" element={<IndexBooks />} />
+          <Route path="categories" element={<IndexCategories />} />
         </Route>
 
       </Route>
     </Routes>
   </BrowserRouter>
-  // </React.StrictMode>,
+  //</React.StrictMode>,
 )

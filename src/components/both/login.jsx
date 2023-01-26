@@ -10,6 +10,8 @@ import validationUtils from "../../utils/validationUtils";
 // import { toast } from 'react-toastify';
 import { FaEyeSlash, FaEye } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { ACTION, GlobalContext } from "../../hooks/globalContext";
 
 const Login = () => {
     const LIST_EMAIL_ADMIN_JSON = import.meta.env.VITE_LIST_EMAIL_ADMIN_JSON;
@@ -18,6 +20,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isWaiting, setIsWaiting] = useState(false);
     const navigate = useNavigate();
+    const { state, dispatch } = useContext(GlobalContext);
 
     const handleClearForm = () => {
         setEmail('');
@@ -36,7 +39,8 @@ const Login = () => {
                 });
 
                 if (data && data.EC === 0) {
-                    window.sessionStorage.setItem("user", JSON.stringify(data.DT))
+
+                    dispatch({ type: ACTION.GET_USER, payload: data.DT })
 
                     let isEmailStartsWithNumber = /^\d/.test(data.DT.email);
                     let isAdminAccount = JSON.parse(LIST_EMAIL_ADMIN_JSON).some(item => item === data.DT.email);
@@ -47,8 +51,7 @@ const Login = () => {
 
                     // STUDENT
                     if (isEmailStartsWithNumber && !isAdminAccount) {
-                        // navigate("/", { state: { student: data.DT } });
-                        navigate("/");
+                        navigate("/", { state: { student: data.DT } });
                     }
 
                     // toast.success(data.EM);

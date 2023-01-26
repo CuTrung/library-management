@@ -1,11 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../../../assets/scss/user/library/cardBook.scss";
 import { removeDiacritics } from "../../../utils/myUtils";
 
 
 const CardBook = ({ imgName, book, rounded = false }) => {
     const navigate = useNavigate();
-
+    const { state, pathname } = useLocation();
 
     return (
         <>

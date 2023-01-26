@@ -1,6 +1,7 @@
 import Accordion from 'react-bootstrap/Accordion';
 import CUDBook from "./CUDBook";
 import IndexApprove from './approve/indexApprove';
+import IndexHistories from './histories/indexHistories';
 
 const IndexBooks = () => {
     return (
@@ -16,6 +17,12 @@ const IndexBooks = () => {
                     <Accordion.Header>Approve to borrow books</Accordion.Header>
                     <Accordion.Body>
                         <IndexApprove />
+                    </Accordion.Body>
+                </Accordion.Item>
+                <Accordion.Item eventKey="2">
+                    <Accordion.Header>Histories borrow books</Accordion.Header>
+                    <Accordion.Body>
+                        <IndexHistories />
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>

@@ -157,7 +157,7 @@ const CUDBook = (props) => {
         <>
             <form id='upsertForm' className="position-relative" onSubmit={(e) => upsertBook(e)}>
 
-                <h3 className='my-3'>{upsertForm.header}</h3>
+                <h3 className='mb-4'>{upsertForm.header}</h3>
 
 
                 <input onChange={(e) => setFileName(e.target.files[0].name)} id='fileUpload' type="file" multiple hidden />

@@ -1,6 +1,7 @@
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 
+// Có thể phát triển dựa vào 'Lượt mượn'
 const TopListBooks = (props) => {
     return (
         <Tabs
@@ -15,10 +16,10 @@ const TopListBooks = (props) => {
                 </ul>
             </Tab>
             <Tab eventKey="profile" title="Top tuần">
-                ok2
+                tuần
             </Tab>
             <Tab eventKey="contact" title="Top ngày">
-                ok
+                ngày
             </Tab>
         </Tabs>
     )

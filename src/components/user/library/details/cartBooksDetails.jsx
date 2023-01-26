@@ -8,14 +8,14 @@ import { TfiFaceSad } from 'react-icons/tfi';
 import Form from 'react-bootstrap/Form';
 import '../../../../assets/scss/user/library/details/cartBooksDetails.scss';
 import { $$, fetchData } from "../../../../utils/myUtils";
+import useToggle from "../../../../hooks/useToggle";
 
 
 const CardBooksDetails = (props) => {
     const { state, pathname } = useLocation();
     const [listCart, setListCart] = useState([]);
-
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(!show);
+    const [show, toggleShow] = useToggle(false);
+    const MAX_BOOKS_CAN_BORROW = import.meta.env.VITE_MAX_BOOKS_CAN_BORROW;
 
     function resetCheckedCart() {
         for (const item of $$('[type="checkbox"]')) {
@@ -38,10 +38,20 @@ const CardBooksDetails = (props) => {
             }
         }
 
-        let studentId = '1';
-        let data = await fetchData('POST', `api/histories/${studentId}`, { studentId, bookIdsBorrowed })
+        if (bookIdsBorrowed.length > MAX_BOOKS_CAN_BORROW) {
+            alert(`Bạn chỉ được mượn tối đa ${MAX_BOOKS_CAN_BORROW} cuốn`);
+            return;
+        }
 
-        if (data.EC === 0) {
+        // Khi đã login thì studentId đc lấy động
+        let student = JSON.parse(window.sessionStorage.getItem('user'));
+        let data = await fetchData('POST', `api/histories`, { bookIdsBorrowed, student })
+
+        if (data.EC === 0 || data.EC === 1) {
+            if (data.EC === 1) {
+                alert("Bạn đã đăng kí mượn tối đa, ko thể mượn thêm");
+                return;
+            }
             resetCheckedCart();
             setListCart(itemRemaining);
         }
@@ -65,9 +75,9 @@ const CardBooksDetails = (props) => {
 
     return (
         <>
-            <button className='btn btn-outline-secondary px-5' onClick={handleClose} ><FaShoppingCart /> Cart ({listCart.length})</button>
+            <button className='btn btn-outline-secondary px-5' onClick={toggleShow} ><FaShoppingCart /> Cart ({listCart.length})</button>
 
-            <Modal show={show} onHide={handleClose} backdrop="static" size="lg">
+            <Modal show={show} onHide={toggleShow} backdrop="static" size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>Số sách muốn mượn</Modal.Title>
                 </Modal.Header>
@@ -107,8 +117,8 @@ const CardBooksDetails = (props) => {
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <p className="fst-italic opacity-75">Please check book you want to borrowed</p>
-                    <Button variant="secondary" onClick={handleClose}>
+                    <p className="fst-italic opacity-75">Please check book you want to borrowed <strong className="text-danger">(Max = {MAX_BOOKS_CAN_BORROW})</strong></p>
+                    <Button variant="secondary" onClick={toggleShow}>
                         Close
                     </Button>
                     <Button variant="primary" onClick={() => handleConfirm()}>
