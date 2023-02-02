@@ -3,6 +3,7 @@ import { useEffect, useState, forwardRef, useRef, useImperativeHandle, useContex
 import MyPagination from "../../both/myPagination";
 import { fetchData, removeDiacritics } from '../../../utils/myUtils';
 import _ from "lodash";
+import SearchBar from '../../both/searchBar';
 
 
 
@@ -16,31 +17,11 @@ const ListCategories = (props, ref) => {
 
     async function getCategories() {
         let data = await fetchData('GET', `api/categories?limit=${limitItem}&page=${currentPage}`)
+
         if (data.EC === 0) {
             listCategoriesRef.current = data.DT.categories;
             setListCategories(data.DT.categories);
             setTotalPages(data.DT.totalPages);
-        }
-    }
-
-    // Chưa hoàn thành
-    function handleSearch(e) {
-        let listCategoriesClone = _.cloneDeep(listCategories);
-        let searchValue = removeDiacritics(e.target.value);
-
-        // Khi chuyển sang có dấu thì đang có bug (console.log để xem)
-        if (searchValue === '') {
-            setListCategories(listCategoriesRef.current);
-        }
-        else {
-            if (searchValue.length === 1) {
-                listCategoriesClone = listCategoriesClone.filter((category) => {
-                    return category.name.toLowerCase().includes(e.target.value.toLowerCase())
-                })
-            } else {
-
-            }
-            setListCategories(listCategoriesClone);
         }
     }
 
@@ -58,9 +39,19 @@ const ListCategories = (props, ref) => {
     return (
         <>
             <h3 className='float-start my-3'>List categories</h3>
-            <input type="search" className='form-control w-25 float-end my-3' placeholder='searching...'
-                onChange={(e) => handleSearch(e)}
-            />
+
+            {listCategoriesRef?.current?.length > 0 &&
+                <SearchBar
+                    listRefDefault={listCategoriesRef.current}
+                    listSearch={listCategories}
+                    setListSearch={setListCategories}
+                    pathDeepObj={'name'}
+                    classNameCss={'float-end my-3'}
+                    placeholder={'Searching ...'}
+                />
+            }
+
+
             <Table className='my-3' bordered hover>
                 <thead>
                     <tr>

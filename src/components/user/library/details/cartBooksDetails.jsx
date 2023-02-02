@@ -1,21 +1,24 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FaShoppingCart } from 'react-icons/fa';
 import ListGroup from 'react-bootstrap/ListGroup';
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { TfiFaceSad } from 'react-icons/tfi';
 import Form from 'react-bootstrap/Form';
 import '../../../../assets/scss/user/library/details/cartBooksDetails.scss';
 import { $$, fetchData } from "../../../../utils/myUtils";
 import useToggle from "../../../../hooks/useToggle";
+import { ACTION, GlobalContext } from "../../../../context/globalContext";
 
 
 const CardBooksDetails = (props) => {
-    const { state, pathname } = useLocation();
     const [listCart, setListCart] = useState([]);
     const [show, toggleShow] = useToggle(false);
     const MAX_BOOKS_CAN_BORROW = import.meta.env.VITE_MAX_BOOKS_CAN_BORROW;
+
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
+    const navigate = useNavigate();
 
     function resetCheckedCart() {
         for (const item of $$('[type="checkbox"]')) {
@@ -26,6 +29,8 @@ const CardBooksDetails = (props) => {
     }
 
     async function handleConfirm() {
+        if (!stateGlobal.user || !window.sessionStorage.getItem("user")) return navigate('/login')
+
         let bookIdsBorrowed = [], itemRemaining = [];
         for (const item of $$('[type="checkbox"]')) {
             if (item.checked) {
@@ -43,10 +48,8 @@ const CardBooksDetails = (props) => {
             return;
         }
 
-        // Khi đã login thì studentId đc lấy động
-        let student = JSON.parse(window.sessionStorage.getItem('user'));
-        let data = await fetchData('POST', `api/histories`, { bookIdsBorrowed, student })
 
+        let data = await fetchData('POST', `api/histories`, { bookIdsBorrowed })
         if (data.EC === 0 || data.EC === 1) {
             if (data.EC === 1) {
                 alert("Bạn đã đăng kí mượn tối đa, ko thể mượn thêm");
@@ -69,9 +72,9 @@ const CardBooksDetails = (props) => {
     }
 
     useEffect(() => {
-        if (state && !state?.pushToCart)
-            state.pushToCart = pushToCart;
-    }, [state])
+        dispatch({ type: ACTION.ADD_FN_PUSH_TO_CART, payload: pushToCart })
+
+    }, [])
 
     return (
         <>
@@ -90,7 +93,7 @@ const CardBooksDetails = (props) => {
                                         <ListGroup.Item key={`bookCart-${index}`} className="position-relative">
                                             <div className="row">
                                                 <div className="col-3 text-center ">
-                                                    <img src="../../../../src/assets/img/quiz3.jpg" className="rounded-circle w-50" alt="" />
+                                                    <img src={book?.image ?? `../../../../src/assets/img/default.jpg`} className="rounded-circle w-50" alt="" />
                                                 </div>
                                                 <div className="col-9 border-start border-3 border-info ">
                                                     <Form.Check

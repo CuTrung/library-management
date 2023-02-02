@@ -2,23 +2,32 @@ import { FaUserAlt } from 'react-icons/fa';
 import { BiRss } from 'react-icons/bi';
 import { AiFillTag, AiOutlineHeart } from 'react-icons/ai';
 import { BsEye } from 'react-icons/bs';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { ACTION, GlobalContext } from '../../../../context/globalContext';
 
 const BookDetails = (props) => {
-    const { state, pathname } = useLocation();
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
+    const navigate = useNavigate();
 
     const handleAddCart = () => {
-        state?.pushToCart(state.book);
+        if (!stateGlobal.user || !window.sessionStorage.getItem("user"))
+            return navigate('/login');
+        stateGlobal?.pushToCart(stateGlobal.dataBookBorrowed);
+    }
+
+    const handleCategory = (categoryId) => {
+        dispatch({ type: ACTION.SET_CATEGORY_IDS_CONTENT_LIBRARY, payload: categoryId })
     }
 
     return (
         <>
             <div className='row'>
                 <div className="col-3">
-                    <img className='w-100 pt-3' src="../../../../src/assets/img/quiz3.jpg" alt="" />
+                    <img className='w-100 pt-3' src={stateGlobal.dataBookBorrowed.image ?? "../../../../src/assets/img/default.jpg"} alt="" />
                 </div>
                 <div className="col-9">
-                    <h4>{state?.book?.name}</h4>
+                    <h4>{stateGlobal.dataBookBorrowed.name}</h4>
                     <p>[Cập nhật lúc: time]</p>
                     <div className="row">
                         <div className="col-6">
@@ -29,12 +38,14 @@ const BookDetails = (props) => {
                         </div>
                         <div className="col-6">
                             <p>Đang cập nhật</p>
-                            <p>{state?.book?.Status?.name}</p>
+                            <p>{stateGlobal.dataBookBorrowed.Status?.name}</p>
                             <p>
-                                {state?.book?.Categories?.length > 0 && state?.book?.Categories?.map((category, index) => {
+                                {stateGlobal.dataBookBorrowed.Categories?.length > 0 && stateGlobal.dataBookBorrowed.Categories?.map((category, index) => {
                                     return (
-                                        <Link key={`categoryDetails-${index}`} className='text-decoration-none'>
-                                            {`${category.name} ${index === state.book.Categories.length - 1 ? '' : '-'} `}
+                                        <Link to='/' key={`categoryDetails-${index}`} className='text-decoration-none'
+                                            onClick={() => handleCategory(category.id)}
+                                        >
+                                            {`${category.name} ${index === stateGlobal.dataBookBorrowed.Categories.length - 1 ? '' : '-'} `}
                                         </Link>
                                     )
                                 }, '')}

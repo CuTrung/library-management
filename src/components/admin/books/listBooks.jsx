@@ -41,7 +41,8 @@ const ListBooks = (props, ref) => {
             <h3 className='float-start my-3'>List books</h3>
             {listBooksRef?.current?.length > 0 &&
                 <SearchBar
-                    listSearch={listBooksRef.current}
+                    listRefDefault={listBooksRef.current}
+                    listSearch={listBooks}
                     setListSearch={setListBooks}
                     pathDeepObj={'name'}
                     classNameCss={'float-end my-3'}

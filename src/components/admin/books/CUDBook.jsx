@@ -3,11 +3,13 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ListBooks from './listBooks';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { fetchData } from '../../../utils/myUtils';
+import { fetchData, toBase64 } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
 import '../../../assets/scss/admin/books/CUDBook.scss';
 import { FcUpload } from "react-icons/fc";
+import { BsCardImage } from "react-icons/bs";
+
 
 
 
@@ -16,6 +18,8 @@ const CUDBook = (props) => {
     const [listStatus, setListStatus] = useState([]);
     const [listCategories, setListCategories] = useState([]);
     const [fileName, setFileName] = useState(null);
+    const [image, setImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
     const listBooksRef = useRef();
 
     const name = useRef("");
@@ -69,8 +73,9 @@ const CUDBook = (props) => {
         document.getElementById('upsertForm').reset();
         setFileName(null);
         setBookUpdate({});
+        setPreviewImage(null);
+        setImage(null);
     }
-
 
     async function upsertBook(e) {
         e.preventDefault();
@@ -92,13 +97,17 @@ const CUDBook = (props) => {
             }
         }
 
+
+        let imgBase64 = image ? await toBase64(image) : null;
+
         let data = await fetchData('POST', 'api/books', {
             name: name.current.value,
             price: price.current.value,
             quantity: quantity.current.value,
             statusId: status.current.value,
             id: bookUpdate.id,
-            categoryIds: categoryIds
+            categoryIds: categoryIds,
+            image: imgBase64
         })
 
         if (data.EC === 0) {
@@ -138,6 +147,16 @@ const CUDBook = (props) => {
         }
     }
 
+    function handleImage(e) {
+        let file = e.target.files[0];
+
+        if (file && file.type.split("/")[0] === "image") {
+            setImage(file);
+            setPreviewImage(URL.createObjectURL(file));
+
+        }
+    }
+
     useEffect(() => {
         getCategories();
         getStatus();
@@ -161,11 +180,11 @@ const CUDBook = (props) => {
 
 
                 <input onChange={(e) => setFileName(e.target.files[0].name)} id='fileUpload' type="file" multiple hidden />
-                <button
-                    onClick={() => document.getElementById('fileUpload').click()}
+                <label
+                    htmlFor='fileUpload'
                     className={`btn btn-outline-secondary position-absolute top-0 end-0 border border-2 border-${fileName ? 'success' : 'dark'} me-5 p-1`}
                 >{fileName ?? 'Upload excel'} <FcUpload size={'34px'} />
-                </button>
+                </label>
 
 
 
@@ -228,8 +247,29 @@ const CUDBook = (props) => {
                     </Form.Select>
                 </span>
 
-                <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'>{upsertForm.buttonContent}</Button>
-                <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor} me-3`} type='button'>{upsertForm.supportButtonContent}</Button>
+                <div>
+                    <input onChange={(e) => handleImage(e)} id='imgUpload' type="file" hidden />
+                    <label
+                        className='btn btn-outline-success mb-3'
+                        htmlFor='imgUpload'
+                    ><BsCardImage size={24} className='me-2' />Upload image</label>
+
+                    <div className='preview rounded position-relative text-center py-2'>
+                        {previewImage ?
+                            <img src={previewImage} alt="" />
+                            :
+                            <p className='position-absolute top-50 start-50 translate-middle opacity-75'>Preview image</p>
+                        }
+
+                    </div>
+                </div>
+
+
+                <div className='d-flex gap-3 mt-3'>
+                    <Button className={`btn-${upsertForm.buttonColor}`} type='submit'>{upsertForm.buttonContent}</Button>
+                    <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor}`} type='button'>{upsertForm.supportButtonContent}</Button>
+                </div>
+
             </form>
 
             <ListBooks

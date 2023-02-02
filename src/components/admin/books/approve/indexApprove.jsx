@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useContext } from "react";
 import { convertTimeStringToSecond, fetchData, getSecondsCurrent } from "../../../../utils/myUtils";
 import SearchBar from "../../../both/searchBar";
 import Table from 'react-bootstrap/Table';
 import MyPagination from "../../../both/myPagination";
 import useToggle from "../../../../hooks/useToggle";
 import { useNavigate } from "react-router-dom";
+import { ACTION, GlobalContext } from "../../../../context/globalContext";
 
 
 // BUGS: Đang call api DELETE liên tục, chỉ call api delete khi ở component approve
@@ -17,6 +18,8 @@ const IndexApprove = (props) => {
     const [minutesClearBook, setMinutesClearBook] = useState(1);
     const [showListBorrowed, toggleShowListBorrowed] = useToggle(false);
     const navigate = useNavigate();
+
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
 
     const listApproveBorrowed = useMemo(() => {
         let propsList = {
@@ -42,8 +45,9 @@ const IndexApprove = (props) => {
         let data = await fetchData('GET', `api/histories?limit=${limitItem}&page=${currentPage}`)
         if (data.EC === 0 || data.EC === 1) {
             listStudentsRef.current = data.DT.histories;
-            // Send data to histories
-            navigate('', { state: { listHistories: data.DT.histories } })
+
+            dispatch({ type: ACTION.SET_DATA_LIST_HISTORIES, payload: data.DT.histories })
+
             setListStudents(data.DT.histories);
             setTotalPages(data.DT.totalPages);
 
@@ -114,7 +118,8 @@ const IndexApprove = (props) => {
 
             {listStudentsRef?.current?.length > 0 &&
                 <SearchBar
-                    listSearch={listStudentsRef.current}
+                    listRefDefault={listStudentsRef.current}
+                    listSearch={listStudents}
                     setListSearch={setListStudents}
                     pathDeepObj={'Student.fullName'}
                     classNameCss={'w-25 float-end'}

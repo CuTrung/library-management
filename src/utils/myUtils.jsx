@@ -5,7 +5,9 @@ const fetchData = async (method, url, payload) => {
     let data = null;
     method = method.toLowerCase();
     try {
-        if (method === 'delete')
+        if (method === 'get')
+            data = await axios[method](url, { params: { ...payload } });
+        else if (method === 'delete')
             data = await axios[method](url, { data: { ...payload } });
         else
             data = await axios[method](url, payload);
@@ -22,11 +24,11 @@ const currencyVND = (value) => {
 
 const removeDiacritics = (value, lowerOrUpper = 'LOWER') => {
     if (!lowerOrUpper)
-        return value.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+        return value?.normalize("NFD")?.replace(/\p{Diacritic}/gu, "");
 
     value =
-        lowerOrUpper === 'LOWER' ? value.toLowerCase() : value.toUpperCase();
-    return value.normalize("NFD").replace(/\p{Diacritic}/gu, "");
+        lowerOrUpper === 'LOWER' ? value?.toLowerCase() : value?.toUpperCase();
+    return value?.normalize("NFD")?.replace(/\p{Diacritic}/gu, "");
 }
 
 const convertStringToASCII = (value) => {
@@ -68,6 +70,13 @@ const getCurrentDate = () => {
     return dd + '/' + mm + '/' + yyyy;
 }
 
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
 const $ = (classOrId) => {
     return document.querySelector(classOrId);
 }
@@ -78,5 +87,6 @@ const $$ = (classOrId) => {
 
 export {
     fetchData, currencyVND, removeDiacritics, sortList, $, $$,
-    convertTimeStringToSecond, getSecondsCurrent, getCurrentDate
+    convertTimeStringToSecond, getSecondsCurrent, getCurrentDate,
+    toBase64
 }

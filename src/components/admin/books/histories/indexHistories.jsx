@@ -4,12 +4,15 @@ import SearchBar from "../../../both/searchBar";
 import Table from 'react-bootstrap/Table';
 
 import { CiExport } from "react-icons/ci";
+import { useContext } from "react";
+import { GlobalContext } from "../../../../context/globalContext";
 
 
 const IndexHistories = (props) => {
-    const { state, pathname } = useLocation();
     const [listHistories, setListHistories] = useState([]);
     const MAX_DAYS_TO_BORROW_BOOKS = import.meta.env.VITE_MAX_DAYS_TO_BORROW_BOOKS;
+
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
 
     const days = (date1, date2) => {
         let difference = date1.getTime() - date2.getTime();
@@ -33,8 +36,8 @@ const IndexHistories = (props) => {
     }
 
     useEffect(() => {
-        setListHistories(state?.listHistories ?? []);
-    }, [state?.listHistories])
+        setListHistories(stateGlobal.dataListHistories ?? []);
+    }, [stateGlobal.dataListHistories])
 
 
     return (
@@ -47,9 +50,10 @@ const IndexHistories = (props) => {
                 onClick={() => handleExport()}
             >Export excel <CiExport size={24} /></button>
 
-            {state?.listHistories?.length > 0 &&
+            {stateGlobal.dataListHistories?.length > 0 &&
                 <SearchBar
-                    listSearch={state?.listHistories}
+                    listRefDefault={stateGlobal.dataListHistories}
+                    listSearch={listHistories}
                     setListSearch={setListHistories}
                     pathDeepObj={'Student.fullName'}
                     classNameCss={'w-25 float-end'}

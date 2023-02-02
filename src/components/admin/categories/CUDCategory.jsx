@@ -12,7 +12,6 @@ import '../../../assets/scss/admin/categories/CUDCategory.scss';
 
 
 const CUDCategory = (props) => {
-    const [listCategories, setListCategories] = useState([]);
     const listCategoriesRef = useRef();
 
     const name = useRef("");
@@ -37,17 +36,6 @@ const CUDCategory = (props) => {
         return propsForm;
     }, [categoryUpdate])
 
-
-    async function getCategories() {
-        try {
-            let data = await fetchData('GET', 'api/categories')
-            if (data.EC === 0) {
-                setListCategories(data.DT);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
     function handleClearForm() {
         document.getElementById('upsertForm').reset();
@@ -90,9 +78,6 @@ const CUDCategory = (props) => {
         }
     }
 
-    useEffect(() => {
-        getCategories();
-    }, [])
 
     useEffect(() => {
         if (!_.isEmpty(categoryUpdate)) {

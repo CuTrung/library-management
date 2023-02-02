@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import './App.css';
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Header from './components/user/header';
-import GlobalContextProvider from './hooks/globalContext';
+import GlobalContextProvider, { GlobalContext } from './context/globalContext';
+import { useContext } from 'react';
+import { useEffect } from 'react';
 
 
 
@@ -10,8 +12,7 @@ import GlobalContextProvider from './hooks/globalContext';
 function App() {
 
   return (
-
-    <GlobalContextProvider initValue={{ user: null }}>
+    <GlobalContextProvider initValue={{ user: window.sessionStorage.getItem("user") ?? null }}>
       <div className="App">
         <div className='header'>
           <Header />

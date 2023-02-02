@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
@@ -16,14 +16,15 @@ import Login from './components/both/login';
 import IndexLibrary from './components/user/library/indexLibrary';
 import IndexDetails from './components/user/library/details/indexDetails';
 import HomeLibrary from './components/user/library/homeLibrary';
+import Page404 from './components/both/page404';
+import IndexGroupRoles from './components/admin/groupRoles/indexGroupRoles';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   //<React.StrictMode>
   <BrowserRouter>
     <Routes>
-      <Route path="/" element={<App />}>
-
+      <Route path="/" element={<App />} >
         <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
 
@@ -35,9 +36,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/admin" element={<Admin />}>
           <Route path="books" element={<IndexBooks />} />
           <Route path="categories" element={<IndexCategories />} />
+          <Route path="groupRoles" element={<IndexGroupRoles />} />
         </Route>
-
       </Route>
+
+      <Route path='*' element={<Page404 />} />
+
     </Routes>
   </BrowserRouter>
   //</React.StrictMode>,

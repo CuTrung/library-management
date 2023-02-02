@@ -15,7 +15,7 @@ const CarouselLibrary = ({ listBooks }) => {
                                     <CardBook
                                         key={`cardBook-${index}`}
                                         book={book}
-                                        imgName={"quiz3.jpg"}
+                                        disabled={book.quantity - book.borrowed === 0}
                                     />
                                 );
                             })}

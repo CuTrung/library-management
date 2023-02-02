@@ -4,84 +4,74 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { fetchData } from '../../utils/myUtils';
+import { $, fetchData } from '../../utils/myUtils';
 import CartBooksDetails from './library/details/cartBooksDetails';
-import { useMemo } from 'react';
-import { ACTION, GlobalContext } from '../../hooks/globalContext';
+import { ACTION, GlobalContext } from '../../context/globalContext';
 import { useContext } from 'react';
 
 const Header = (props) => {
 
-    const [listCategories, setListCategories] = useState([]);
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
     const navigate = useNavigate();
 
-    const { stateGlobal, dispatch } = useContext(GlobalContext);
+    function handleLogout() {
+        window.sessionStorage.removeItem("user");
+        dispatch({ type: ACTION.GET_USER, payload: null });
 
-
-    async function handleCategory(category) {
-        let data = await fetchData('GET', `api/books/${category.id}`);
-        if (data.EC === 0) {
-            navigate('/', { state: { listBooksByCategoryId: data.DT, categoryName: category.name } })
-        }
+        navigate('/login')
     }
-
-    useEffect(() => {
-
-    }, [])
-
-    console.log(">>> Check data", stateGlobal);
 
 
 
     return (
         <>
-            <Navbar bg="light" expand="lg">
-                <Container>
-                    <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="me-auto">
-                            <NavLink className='nav-link' to='/'>Home</NavLink>
-                            <NavLink className='nav-link' to='/about'>About</NavLink>
-                            <NavLink className='nav-link' to='/admin'>Admin</NavLink>
+            {!window.location.pathname.includes('/admin') ?
+                <Navbar bg="light" expand="lg">
+                    <Container>
+                        <Navbar.Brand href="/">Library ITC</Navbar.Brand>
+                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                        <Navbar.Collapse id="basic-navbar-nav">
+                            <Nav className="me-auto">
+                                <NavLink className='nav-link' to='/'>Home</NavLink>
+                                <NavLink className='nav-link' to='/about'>About</NavLink>
+                                {/* <NavLink className='nav-link' to='/admin'>Admin</NavLink> */}
+                            </Nav>
 
-                            <NavDropdown
-                                id="nav-dropdown-dark-example"
-                                title="Category"
-                            >
-                                {stateGlobal?.categories?.length > 0 &&
-                                    stateGlobal?.categories?.map((category, index) => {
-                                        return (
-                                            <NavDropdown.Item key={`category-${index}`} onClick={() => handleCategory(category)}>
-                                                {category.name}
-                                            </NavDropdown.Item>
-                                        )
-                                    })}
+                            {stateGlobal.user ?
+                                <>
+                                    <CartBooksDetails />
 
-                            </NavDropdown>
-                        </Nav>
+                                    <Nav className='ms-3'>
+                                        <NavDropdown title={`Welcome ${stateGlobal.user}`} id="basic-nav-dropdown">
+                                            <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
+                                            <NavDropdown.Item onClick={() => handleLogout()}>Logout</NavDropdown.Item>
+                                        </NavDropdown>
+                                    </Nav>
+                                </>
+                                :
+                                <NavLink className='nav-link' to="/login">Login</NavLink>
+                            }
 
-                        {stateGlobal.user ?
-                            <>
-                                <CartBooksDetails />
-
-                                <Nav className='ms-3'>
-                                    <NavDropdown title={`Welcome ${stateGlobal.user.fullName}`} id="basic-nav-dropdown">
-                                        <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
-                                        <NavDropdown.Item href="#action/3.1">Logout</NavDropdown.Item>
-                                    </NavDropdown>
-                                </Nav>
-                            </>
-                            :
-                            <NavLink className='nav-link' to="/login">Login</NavLink>
-                        }
-
-                    </Navbar.Collapse>
-                </Container>
-            </Navbar>
-
+                        </Navbar.Collapse>
+                    </Container>
+                </Navbar>
+                :
+                <>
+                    <Navbar bg="light" expand="lg">
+                        <Container>
+                            <Nav></Nav>
+                            <Nav className='w-25'>
+                                <NavDropdown className=' border border-3' title={`Welcome ${stateGlobal.user}`} id="basic-nav-dropdown">
+                                    <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
+                                    <NavDropdown.Item onClick={() => handleLogout()}>Logout</NavDropdown.Item>
+                                </NavDropdown>
+                            </Nav>
+                        </Container>
+                    </Navbar>
 
 
+                </>
+            }
         </>
     );
 

@@ -1,8 +1,9 @@
 import React, { Component, useRef, useState } from "react";
+import { useEffect } from "react";
 import ReactPaginate from 'react-paginate';
 
 
-const MyPagination = ({ setCurrentPage, totalPages }) => {
+const MyPagination = ({ setCurrentPage, totalPages, classCss }) => {
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
     }
@@ -24,7 +25,7 @@ const MyPagination = ({ setCurrentPage, totalPages }) => {
             breakLabel="..."
             breakClassName="page-item"
             breakLinkClassName="page-link"
-            containerClassName="pagination d-flex justify-content-center"
+            containerClassName={`pagination d-flex justify-content-center mt-3 ${classCss}`}
             activeClassName="active"
             renderOnZeroPageCount={null}
         />
