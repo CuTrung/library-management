@@ -6,18 +6,19 @@ import MyPagination from "../../../both/myPagination";
 import useToggle from "../../../../hooks/useToggle";
 import { useNavigate } from "react-router-dom";
 import { ACTION, GlobalContext } from "../../../../context/globalContext";
-
+import '../../../../assets/scss/admin/books/approve/indexApprove.scss';
 
 // BUGS: Đang call api DELETE liên tục, chỉ call api delete khi ở component approve
 const IndexApprove = (props) => {
     const [listStudents, setListStudents] = useState([]);
-    const [limitItem, setLimitItem] = useState(10);
+    const [limitItem, setLimitItem] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(null);
     const listStudentsRef = useRef(null);
     const [minutesClearBook, setMinutesClearBook] = useState(1);
     const [showListBorrowed, toggleShowListBorrowed] = useToggle(false);
     const navigate = useNavigate();
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
 
@@ -39,9 +40,7 @@ const IndexApprove = (props) => {
         return propsList;
     }, [showListBorrowed])
 
-
     async function getStudents() {
-
         let data = await fetchData('GET', `api/histories?limit=${limitItem}&page=${currentPage}`)
         if (data.EC === 0 || data.EC === 1) {
             listStudentsRef.current = data.DT.histories;
@@ -50,15 +49,16 @@ const IndexApprove = (props) => {
 
             setListStudents(data.DT.histories);
             setTotalPages(data.DT.totalPages);
-
         }
-
     }
 
     async function handleApprove(historyId) {
+        setIsDisabled(true);
+
         let data = await fetchData('POST', 'api/histories/uptime', { id: historyId });
         if (data.EC === 0) {
             getStudents();
+            setIsDisabled(false);
         }
     }
 
@@ -90,10 +90,6 @@ const IndexApprove = (props) => {
             if (res.DT > 0)
                 await getStudents();
         })
-    }
-
-    async function handleListBorrowed() {
-        toggleShowListBorrowed();
     }
 
     useEffect(() => {
@@ -129,10 +125,10 @@ const IndexApprove = (props) => {
 
             <div className="d-flex flex-row-reverse w-100 gap-3">
                 <button onClick={() => getStudents()} className="btn btn-warning">Refresh</button>
-                <button onClick={() => handleListBorrowed()} className={`btn btn-primary`}>{listApproveBorrowed.buttonChangeContent}</button>
+                <button onClick={() => toggleShowListBorrowed()} className={`btn btn-primary`}>{listApproveBorrowed.buttonChangeContent}</button>
             </div>
 
-            <Table className='my-3' bordered hover>
+            <Table className='listApprove my-3' bordered hover>
                 <thead>
                     <tr>
                         <th>
@@ -144,6 +140,7 @@ const IndexApprove = (props) => {
                         <th>Actions
                             <button className="btn btn-danger btn-sm float-end" data-toggle="tooltip" data-placement="bottom" title="Approve all 'Đươc mượn về'"
                                 onClick={() => handleApprove()}
+                                disabled={isDisabled}
                             >{listApproveBorrowed.supportButtonContent} all</button>
                         </th>
                     </tr>
@@ -163,6 +160,7 @@ const IndexApprove = (props) => {
                                     <td>
                                         <button className={`btn btn-${listApproveBorrowed.buttonColor}`}
                                             onClick={() => handleApprove(item.id)}
+                                            disabled={isDisabled}
                                         >{listApproveBorrowed.buttonContent}</button>
                                     </td>
                                 </tr>

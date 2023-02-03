@@ -18,6 +18,8 @@ import IndexDetails from './components/user/library/details/indexDetails';
 import HomeLibrary from './components/user/library/homeLibrary';
 import Page404 from './components/both/page404';
 import IndexGroupRoles from './components/admin/groupRoles/indexGroupRoles';
+import Register from './components/both/register';
+
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -25,6 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} >
+        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
 

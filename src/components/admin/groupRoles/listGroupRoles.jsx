@@ -6,7 +6,8 @@ import _ from "lodash";
 import SearchBar from '../../both/searchBar';
 import { CiEdit } from 'react-icons/ci';
 import { MdDeleteForever } from 'react-icons/md';
-import '../../../assets/scss/admin/groupRoles/listGroupRoles.scss'
+// import '../../../assets/scss/admin/groupRoles/listGroupRoles.scss';
+import LoadingIcon from '../../both/loadingIcon';
 
 
 
@@ -57,57 +58,63 @@ const ListGroupRoles = (props, ref) => {
                 />
             }
 
-
-            <Table className='my-3' bordered hover>
-                <thead>
-                    <tr>
-                        <th>Group Name</th>
-                        <th>GroupRoles</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {listGroupRoles.length > 0 && listGroupRoles.map((groupRole, index) => {
-                        return (
-                            <tr key={`groupRole-${index}`}>
-                                <td>
-                                    {groupRole.name}
-                                    <span className='editRoleIcon float-end d-flex gap-2'>
-                                        <CiEdit size={24}
-                                            onClick={() => props.setGroupRoleUpdate({ ...groupRole, type: 'GROUP' })}
-                                        />
-                                        <MdDeleteForever size={24} color='red'
-                                            onClick={() => props.handleDelete('GROUP', groupRole.id)}
-                                        />
-                                    </span>
-                                </td>
-                                <td>
-                                    {groupRole.Roles.length > 0 && groupRole.Roles.map((role, indexRole) => {
-                                        return (
-                                            role.url &&
-                                            <p key={`role-${indexRole}`}
-                                                className='' style={{ minWidth: '36px' }}
-                                            >{role.url}
-                                                <span className='editRoleIcon float-end d-flex gap-2'>
-                                                    <CiEdit size={24}
-                                                        onClick={() => props.setGroupRoleUpdate({ ...role, type: 'ROLE' })}
-                                                    />
-                                                    <MdDeleteForever size={24} color='red'
-                                                        onClick={() => props.handleDelete('ROLE', role.id, groupRole.id)}
-                                                    />
-                                                </span>
-                                            </p>
-                                        )
-                                    })}
-                                </td>
+            {listGroupRoles.length > 0 ?
+                <>
+                    <Table className='listGroupRoles my-3' bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Group Name</th>
+                                <th>GroupRoles</th>
                             </tr>
-                        )
-                    })}
-                </tbody>
-            </Table>
-            <MyPagination
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-            />
+                        </thead>
+                        <tbody>
+                            {listGroupRoles.length > 0 && listGroupRoles.map((groupRole, index) => {
+                                return (
+                                    <tr key={`groupRole-${index}`}>
+                                        <td>
+                                            {groupRole.name}
+                                            <span className='editRoleIcon float-end d-flex gap-2'>
+                                                <CiEdit size={24}
+                                                    onClick={() => props.setGroupRoleUpdate({ ...groupRole, type: 'GROUP' })}
+                                                />
+                                                <MdDeleteForever size={24} color='red'
+                                                    onClick={() => props.handleDelete('GROUP', groupRole.id)}
+                                                />
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {groupRole.Roles.length > 0 && groupRole.Roles.map((role, indexRole) => {
+                                                return (
+                                                    role.url &&
+                                                    <p key={`role-${indexRole}`}
+                                                        className='' style={{ minWidth: '36px' }}
+                                                    >{role.url}
+                                                        <span className='editRoleIcon float-end d-flex gap-2'>
+                                                            <CiEdit size={24}
+                                                                onClick={() => props.setGroupRoleUpdate({ ...role, type: 'ROLE' })}
+                                                            />
+                                                            <MdDeleteForever size={24} color='red'
+                                                                onClick={() => props.handleDelete('ROLE', role.id, groupRole.id)}
+                                                            />
+                                                        </span>
+                                                    </p>
+                                                )
+                                            })}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </Table>
+                    <MyPagination
+                        totalPages={totalPages}
+                        setCurrentPage={setCurrentPage}
+                    />
+                </>
+                :
+                <LoadingIcon />
+            }
+
         </>
     );
 }

@@ -9,6 +9,8 @@ import validationUtils from '../../../utils/validationUtils';
 import '../../../assets/scss/admin/books/CUDBook.scss';
 import { FcUpload } from "react-icons/fc";
 import { BsCardImage } from "react-icons/bs";
+import { useContext } from 'react';
+import { GlobalContext } from '../../../context/globalContext';
 
 
 
@@ -21,6 +23,8 @@ const CUDBook = (props) => {
     const [image, setImage] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
     const listBooksRef = useRef();
+    const [isDisabled, setIsDisabled] = useState(false);
+
 
     const name = useRef("");
     const price = useRef("");
@@ -45,7 +49,6 @@ const CUDBook = (props) => {
         }
         return propsForm;
     }, [bookUpdate])
-
 
     async function getStatus() {
         try {
@@ -78,6 +81,7 @@ const CUDBook = (props) => {
     }
 
     async function upsertBook(e) {
+        setIsDisabled(true);
         e.preventDefault();
 
         // Upload file with excel (Coming soon ...)
@@ -113,15 +117,18 @@ const CUDBook = (props) => {
         if (data.EC === 0) {
             listBooksRef.current.fetchListBooks();
             handleClearForm();
+            setIsDisabled(false);
         }
 
     }
 
     async function deleteBook(id) {
+
         let data = await fetchData('DELETE', 'api/books', { id })
 
         if (data.EC === 0) {
             listBooksRef.current.fetchListBooks();
+
         }
     }
 
@@ -266,7 +273,9 @@ const CUDBook = (props) => {
 
 
                 <div className='d-flex gap-3 mt-3'>
-                    <Button className={`btn-${upsertForm.buttonColor}`} type='submit'>{upsertForm.buttonContent}</Button>
+                    <Button className={`btn-${upsertForm.buttonColor}`} type='submit'
+                        disabled={isDisabled}
+                    >{upsertForm.buttonContent}</Button>
                     <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor}`} type='button'>{upsertForm.supportButtonContent}</Button>
                 </div>
 

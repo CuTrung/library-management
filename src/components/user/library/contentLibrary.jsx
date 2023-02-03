@@ -6,6 +6,7 @@ import SearchBar from '../../both/searchBar';
 import Form from 'react-bootstrap/Form';
 import { AiFillFilter } from "react-icons/ai";
 import { $$, fetchData } from "../../../utils/myUtils";
+import '../../../assets/scss/user/library/contentLibrary.scss';
 
 
 const ContentLibrary = (props) => {
@@ -41,6 +42,13 @@ const ContentLibrary = (props) => {
         }
 
         if (isClearFilter) {
+            dispatch({
+                type: ACTION.SET_CATEGORY_IDS_CONTENT_LIBRARY,
+                payload: {
+                    categoryIds: null,
+                    categoryNames: ''
+                }
+            })
             return stateGlobal.fnGetBooksHomeLibrary?.();
         }
 
@@ -66,7 +74,7 @@ const ContentLibrary = (props) => {
     return (
         <>
             <div className="row">
-                <div className="col-2 border border-3">
+                <div className="col-md-2 col-sm-12 border border-3">
                     <h3 className="mt-3 text-uppercase">Filter
                         <button className="btn btn-success float-end"
                             onClick={() => handleFilter()}
@@ -91,48 +99,49 @@ const ContentLibrary = (props) => {
                         })}
                     </div>
                 </div>
-                <div className="col-10 border border-3 row">
-                    <div className="w-100 my-3">
-                        <h4 className="text-info float-start w-50 text-wrap">{stateGlobal.dataCategory ? `Sách theo thể loại > ${stateGlobal.dataCategory.categoryNames}` : 'Sách mới cập nhật >'}</h4>
 
-                        {listBooksRef.length > 0 &&
-                            <SearchBar
-                                listRefDefault={listBooksRef}
-                                listSearch={listBooks}
-                                setListSearch={setListBooks}
-                                pathDeepObj={'name'}
-                                classNameCss={'float-end w-50'}
-                                placeholder={"Searching..."}
-                            />
-                        }
 
+                <div className="col-md-10 col-sm-12 border border-3">
+                    <div className="row">
+                        <div className="w-100 my-3">
+                            <h4 className="text-info float-start w-50 text-wrap">{stateGlobal.dataCategory?.categoryNames ? `Sách theo thể loại > ${stateGlobal.dataCategory.categoryNames}` : 'Sách mới cập nhật >'}</h4>
+
+                            {listBooksRef.length > 0 &&
+                                <SearchBar
+                                    listRefDefault={listBooksRef}
+                                    listSearch={listBooks}
+                                    setListSearch={setListBooks}
+                                    pathDeepObj={'name'}
+                                    classNameCss={'float-end w-50'}
+                                    placeholder={"Searching..."}
+                                />
+                            }
+
+                        </div>
+
+                        {/* 12 Items là vừa đẹp */}
+                        <div className="listContentLibrary d-flex flex-wrap">
+                            {listBooks.length > 0 &&
+                                listBooks.map((book, index) => {
+                                    return (
+                                        <CardBook key={`book-${index}`}
+                                            rounded={true}
+                                            book={book}
+                                            disabled={book.quantity - book.borrowed === 0}
+                                        />
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
 
-
-                    {/* 12 Items là vừa đẹp */}
-                    {listBooks.length > 0 &&
-                        listBooks.map((book, index) => {
-                            return (
-                                <CardBook key={`book-${index}`}
-                                    rounded={true}
-                                    book={book}
-                                    disabled={book.quantity - book.borrowed === 0}
-                                />
-                            )
-                        })
-                    }
 
                     <MyPagination
                         classCss={'contentLibraryPagination'}
                         totalPages={totalPages}
                         setCurrentPage={setCurrentPage}
                     />
-
                 </div>
-
-
-
-
             </div>
         </>
     )

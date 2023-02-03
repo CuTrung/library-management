@@ -5,19 +5,26 @@ import { BsEye } from 'react-icons/bs';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { ACTION, GlobalContext } from '../../../../context/globalContext';
+import _ from 'lodash';
 
 const BookDetails = (props) => {
     const { stateGlobal, dispatch } = useContext(GlobalContext);
     const navigate = useNavigate();
 
     const handleAddCart = () => {
-        if (!stateGlobal.user || !window.sessionStorage.getItem("user"))
+        if (_.isEmpty(stateGlobal.user))
             return navigate('/login');
         stateGlobal?.pushToCart(stateGlobal.dataBookBorrowed);
     }
 
-    const handleCategory = (categoryId) => {
-        dispatch({ type: ACTION.SET_CATEGORY_IDS_CONTENT_LIBRARY, payload: categoryId })
+    const handleCategory = (category) => {
+        dispatch({
+            type: ACTION.SET_CATEGORY_IDS_CONTENT_LIBRARY,
+            payload: {
+                categoryIds: category.id,
+                categoryNames: category.name
+            }
+        })
     }
 
     return (
@@ -43,7 +50,7 @@ const BookDetails = (props) => {
                                 {stateGlobal.dataBookBorrowed.Categories?.length > 0 && stateGlobal.dataBookBorrowed.Categories?.map((category, index) => {
                                     return (
                                         <Link to='/' key={`categoryDetails-${index}`} className='text-decoration-none'
-                                            onClick={() => handleCategory(category.id)}
+                                            onClick={() => handleCategory(category)}
                                         >
                                             {`${category.name} ${index === stateGlobal.dataBookBorrowed.Categories.length - 1 ? '' : '-'} `}
                                         </Link>

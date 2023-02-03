@@ -8,17 +8,26 @@ import { $, fetchData } from '../../utils/myUtils';
 import CartBooksDetails from './library/details/cartBooksDetails';
 import { ACTION, GlobalContext } from '../../context/globalContext';
 import { useContext } from 'react';
+import { useSessionStorage } from '../../hooks/useStorage';
+import _ from 'lodash';
 
 const Header = (props) => {
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
     const navigate = useNavigate();
 
-    function handleLogout() {
-        window.sessionStorage.removeItem("user");
-        dispatch({ type: ACTION.GET_USER, payload: null });
+    const [user, setUser, removeUser] = useSessionStorage('user');
 
-        navigate('/login')
+    async function handleLogout() {
+
+        let data = await fetchData('POST', 'api/logout');
+
+        if (data.EC === 0) {
+            window.sessionStorage.removeItem("user");
+        }
+
+        dispatch({ type: ACTION.GET_USER, payload: {} });
+        navigate('/login');
     }
 
 
@@ -37,19 +46,24 @@ const Header = (props) => {
                                 {/* <NavLink className='nav-link' to='/admin'>Admin</NavLink> */}
                             </Nav>
 
-                            {stateGlobal.user ?
+                            {!_.isEmpty(stateGlobal.user) ?
                                 <>
                                     <CartBooksDetails />
 
-                                    <Nav className='ms-3'>
-                                        <NavDropdown title={`Welcome ${stateGlobal.user}`} id="basic-nav-dropdown">
+                                    <Nav className='ms-3 fw-bold'>
+                                        <NavDropdown title={`Welcome ${stateGlobal.user.fullName}`} id="basic-nav-dropdown">
                                             <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
                                             <NavDropdown.Item onClick={() => handleLogout()}>Logout</NavDropdown.Item>
                                         </NavDropdown>
                                     </Nav>
                                 </>
                                 :
-                                <NavLink className='nav-link' to="/login">Login</NavLink>
+                                <>
+                                    <Nav>
+                                        <NavLink className='nav-link' to="/login">Login</NavLink>
+                                        <NavLink className='nav-link btn btn-outline-info' to="/register">Register</NavLink>
+                                    </Nav>
+                                </>
                             }
 
                         </Navbar.Collapse>
@@ -57,19 +71,20 @@ const Header = (props) => {
                 </Navbar>
                 :
                 <>
-                    <Navbar bg="light" expand="lg">
-                        <Container>
-                            <Nav></Nav>
-                            <Nav className='w-25'>
-                                <NavDropdown className=' border border-3' title={`Welcome ${stateGlobal.user}`} id="basic-nav-dropdown">
-                                    <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
-                                    <NavDropdown.Item onClick={() => handleLogout()}>Logout</NavDropdown.Item>
-                                </NavDropdown>
-                            </Nav>
-                        </Container>
-                    </Navbar>
-
-
+                    {!_.isEmpty(stateGlobal.user) &&
+                        <Navbar bg="light" expand="lg">
+                            <Container>
+                                <Nav></Nav>
+                                <Nav className='w-25'>
+                                    <NavDropdown className='border border-3 fw-bold'
+                                        title={`Welcome ${stateGlobal.user.fullName}`} id="basic-nav-dropdown">
+                                        <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
+                                        <NavDropdown.Item onClick={() => handleLogout()}>Logout</NavDropdown.Item>
+                                    </NavDropdown>
+                                </Nav>
+                            </Container>
+                        </Navbar>
+                    }
                 </>
             }
         </>

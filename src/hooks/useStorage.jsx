@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 import { useState, useEffect } from "react";
 
-const useSessionStorage = (key, defaultValue) => {
+export function useSessionStorage(key, defaultValue) {
     return useStorage(key, defaultValue, window.sessionStorage);
 }
 
-const useLocalStorage = (key, defaultValue) => {
+export function useLocalStorage(key, defaultValue) {
     return useStorage(key, defaultValue, window.localStorage);
 }
 
@@ -29,8 +29,6 @@ const useStorage = (key, defaultValue, storageObj) => {
     return [value, setValue, remove];
 }
 
-export {
-    useSessionStorage, useLocalStorage
-}
+
 
 

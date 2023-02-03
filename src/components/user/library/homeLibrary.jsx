@@ -10,7 +10,7 @@ import { useRef } from "react";
 const HomeLibrary = (props) => {
     const [listBooks, setListBooks] = useState([]);
     // 12 items là vừa đẹp
-    const [limitItem, setLimitItem] = useState(3);
+    const [limitItem, setLimitItem] = useState(12);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(null);
     const listBooksRef = useRef([]);
@@ -46,7 +46,6 @@ const HomeLibrary = (props) => {
     useEffect(() => {
         getBooks(stateGlobal.dataCategory?.categoryIds);
     }, [currentPage]);
-
 
     return (
         <>

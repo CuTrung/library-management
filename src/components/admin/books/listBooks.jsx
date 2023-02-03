@@ -11,7 +11,7 @@ import LoadingIcon from '../../both/loadingIcon';
 
 const ListBooks = (props, ref) => {
     const [listBooks, setListBooks] = useState([]);
-    const [limitItem, setLimitItem] = useState(10);
+    const [limitItem, setLimitItem] = useState(5);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(null);
     const listBooksRef = useRef(null);
@@ -52,7 +52,7 @@ const ListBooks = (props, ref) => {
 
             {listBooks.length > 0 ?
                 <>
-                    <Table className='my-3' bordered hover>
+                    <Table className='listBooks my-3' bordered hover>
                         <thead>
                             <tr>
                                 <th>Name

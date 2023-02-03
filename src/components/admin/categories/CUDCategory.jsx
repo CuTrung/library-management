@@ -6,7 +6,6 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { fetchData } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
-import '../../../assets/scss/admin/categories/CUDCategory.scss';
 
 
 
@@ -36,6 +35,7 @@ const CUDCategory = (props) => {
         return propsForm;
     }, [categoryUpdate])
 
+    const [isDisabled, setIsDisabled] = useState(false);
 
     function handleClearForm() {
         document.getElementById('upsertForm').reset();
@@ -44,6 +44,7 @@ const CUDCategory = (props) => {
 
 
     async function upsertCategory(e) {
+        setIsDisabled(true);
         e.preventDefault();
 
         // validate
@@ -60,6 +61,7 @@ const CUDCategory = (props) => {
         if (data.EC === 0) {
             listCategoriesRef.current.fetchListCategories();
             handleClearForm();
+            setIsDisabled(false)
         }
 
     }
@@ -88,15 +90,15 @@ const CUDCategory = (props) => {
 
     return (
         <>
-            <form id='upsertForm' className="position-relative" onSubmit={(e) => upsertCategory(e)}>
+            <div className='row'>
+                <form id='upsertForm' className="position-relative col-4" onSubmit={(e) => upsertCategory(e)}>
 
-                <h3 className='my-3'>{upsertForm.header}</h3>
+                    <h3 className='my-3'>{upsertForm.header}</h3>
 
-                <span className='d-flex gap-3'>
                     <FloatingLabel
                         controlId="floatingInput"
                         label="Name"
-                        className="mb-3 w-75"
+                        className="mb-3"
                     >
                         <Form.Control
                             ref={name} name='name' type="text" placeholder="name@example.com"
@@ -104,23 +106,30 @@ const CUDCategory = (props) => {
                     </FloatingLabel>
 
                     <Form.Check
-                        className='pt-3'
+                        className='mb-3'
                         ref={isBorrowed}
                         name='isBorrowed'
                         type={'checkbox'}
                         label={`can't borrowed`}
                     />
+
+
+                    <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'
+                        disabled={isDisabled}
+                    >{upsertForm.buttonContent}</Button>
+                    <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor} me-3`} type='button'>{upsertForm.supportButtonContent}</Button>
+                </form>
+
+                <span className='col-8'>
+                    <ListCategories
+                        ref={listCategoriesRef}
+                        setCategoryUpdate={setCategoryUpdate}
+                        deleteCategory={deleteCategory}
+                    />
                 </span>
 
-                <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'>{upsertForm.buttonContent}</Button>
-                <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor} me-3`} type='button'>{upsertForm.supportButtonContent}</Button>
-            </form>
+            </div>
 
-            <ListCategories
-                ref={listCategoriesRef}
-                setCategoryUpdate={setCategoryUpdate}
-                deleteCategory={deleteCategory}
-            />
         </>
     )
 }

@@ -99,11 +99,6 @@ const IndexHistories = (props) => {
 
                 </tbody>
             </Table>
-
-            {/* <MyPagination
-                totalPages={totalPages}
-                setCurrentPage={setCurrentPage}
-            /> */}
         </>
     )
 }

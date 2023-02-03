@@ -6,7 +6,6 @@ import { useState, useEffect, useRef, useMemo, useContext } from 'react';
 import { $$, fetchData } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
-import '../../../assets/scss/admin/groupRoles/CUDGroupRole.scss';
 import useToggle from '../../../hooks/useToggle';
 import { MdDeleteForever } from 'react-icons/md';
 
@@ -26,6 +25,8 @@ const CUDGroupRole = (props) => {
     const [listRoles, setListRoles] = useState([]);
 
     const [groupRoles, setGroupRoles] = useState([]);
+
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const upsertForm = useMemo(() => {
         let propsForm = {
@@ -97,6 +98,7 @@ const CUDGroupRole = (props) => {
 
 
     async function upsertGroupRole(type, e) {
+        setIsDisabled(true);
         e?.preventDefault();
 
         // validate
@@ -133,6 +135,7 @@ const CUDGroupRole = (props) => {
             await getRoles();
 
             handleClearForm();
+            setIsDisabled(false);
         }
 
     }
@@ -182,7 +185,9 @@ const CUDGroupRole = (props) => {
                                 onChange={(e) => handleOnChange(e)} />
                         </FloatingLabel>
 
-                        <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'>{upsertForm.buttonContent}</Button>
+                        <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'
+                            disabled={isDisabled}
+                        >{upsertForm.buttonContent}</Button>
 
                         <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor}`} type='button'>{upsertForm.supportButtonContent}</Button>
                     </form>

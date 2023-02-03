@@ -10,7 +10,7 @@ import '../../../../assets/scss/user/library/details/cartBooksDetails.scss';
 import { $$, fetchData } from "../../../../utils/myUtils";
 import useToggle from "../../../../hooks/useToggle";
 import { ACTION, GlobalContext } from "../../../../context/globalContext";
-
+import _ from 'lodash';
 
 const CardBooksDetails = (props) => {
     const [listCart, setListCart] = useState([]);
@@ -19,6 +19,8 @@ const CardBooksDetails = (props) => {
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
     const navigate = useNavigate();
+
+    const [isDisabled, setIsDisabled] = useState(false);
 
     function resetCheckedCart() {
         for (const item of $$('[type="checkbox"]')) {
@@ -29,7 +31,7 @@ const CardBooksDetails = (props) => {
     }
 
     async function handleConfirm() {
-        if (!stateGlobal.user || !window.sessionStorage.getItem("user")) return navigate('/login')
+        if (_.isEmpty(stateGlobal.user)) return navigate('/login')
 
         let bookIdsBorrowed = [], itemRemaining = [];
         for (const item of $$('[type="checkbox"]')) {
@@ -48,15 +50,23 @@ const CardBooksDetails = (props) => {
             return;
         }
 
+        if (bookIdsBorrowed.length === 0) {
+            alert(`Bạn chưa chọn sách muốn mượn`);
+            return;
+        }
 
+        setIsDisabled(true);
         let data = await fetchData('POST', `api/histories`, { bookIdsBorrowed })
+
         if (data.EC === 0 || data.EC === 1) {
             if (data.EC === 1) {
                 alert("Bạn đã đăng kí mượn tối đa, ko thể mượn thêm");
+                setIsDisabled(false);
                 return;
             }
             resetCheckedCart();
             setListCart(itemRemaining);
+            setIsDisabled(false);
         }
     }
 
@@ -124,7 +134,7 @@ const CardBooksDetails = (props) => {
                     <Button variant="secondary" onClick={toggleShow}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={() => handleConfirm()}>
+                    <Button disabled={isDisabled} variant="primary" onClick={() => handleConfirm()}>
                         Confirm
                     </Button>
                 </Modal.Footer>

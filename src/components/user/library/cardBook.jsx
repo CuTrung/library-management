@@ -4,10 +4,8 @@ import { removeDiacritics } from "../../../utils/myUtils";
 import { useContext } from "react";
 import { ACTION, GlobalContext } from "../../../context/globalContext";
 
-
 const CardBook = ({ book, rounded = false, disabled }) => {
     const navigate = useNavigate();
-    const { state, pathname } = useLocation();
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
 
@@ -18,14 +16,16 @@ const CardBook = ({ book, rounded = false, disabled }) => {
 
     return (
         <>
-            <div className="itemBook col-3 position-relative mb-3">
+            <div className="itemBook col-6 col-md-3 position-relative mb-3">
                 <button
                     disabled={disabled}
                     className={`btn p-0 w-100 border-0`}
                     onClick={() => handleClickBook()}
                 >
-                    {disabled &&
+                    {disabled ?
                         <span className="badge rounded-pill bg-danger float-end">Đã hết</span>
+                        :
+                        <span className="badge rounded-pill bg-danger float-end text-white bg-white">Lấp layout</span>
                     }
 
                     <img

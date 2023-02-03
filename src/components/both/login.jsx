@@ -7,12 +7,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import validationUtils from "../../utils/validationUtils";
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { FaEyeSlash, FaEye } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { ACTION, GlobalContext } from "../../context/globalContext";
 import { useSessionStorage } from "../../hooks/useStorage";
+import _ from 'lodash';
+
 
 const Login = () => {
     const EMAIL_ADMIN = import.meta.env.VITE_EMAIL_ADMIN;
@@ -22,6 +24,8 @@ const Login = () => {
     const [isWaiting, setIsWaiting] = useState(false);
     const navigate = useNavigate();
     const { stateGlobal, dispatch } = useContext(GlobalContext);
+
+    const [user, setUser] = useSessionStorage("user", null)
 
     const handleClearForm = () => {
         setEmail('');
@@ -40,28 +44,38 @@ const Login = () => {
                 });
 
                 if (data && data.EC === 0) {
-                    window.sessionStorage.setItem("user", data.DT.fullName);
-                    dispatch({ type: ACTION.GET_USER, payload: data.DT.fullName })
-                    let isEmailStartsWithNumber = /^\d/.test(data.DT.email);
+                    window.sessionStorage.setItem("user", JSON.stringify({
+                        fullName: data.DT.fullName,
+                        email: data.DT.email,
+                    }))
+
+                    dispatch({
+                        type: ACTION.GET_USER, payload: {
+                            fullName: data.DT.fullName,
+                            email: data.DT.email,
+                        }
+                    })
+
+
                     // ADMIN
                     if (data.DT.email === EMAIL_ADMIN) {
-                        navigate("/admin");
+                        return navigate("/admin");
                     }
 
                     // STUDENT
-                    if (isEmailStartsWithNumber) {
-                        navigate("/");
-                    }
+                    // let isEmailStartsWithNumber = /^\d/.test(data.DT.email);
+                    navigate("/");
 
-                    // toast.success(data.EM);
+
                     handleClearForm();
+                    toast.success(data.EM);
                 } else {
                     // setIsWaiting(false);
-                    // toast.error(data.EM);
+                    toast.error(data.EM);
                 }
             }
         } catch (error) {
-            // toast.error("Some thing wrongs on client...");
+            toast.error("Some thing wrongs on client...");
             console.log(error);
         }
     }
@@ -72,11 +86,9 @@ const Login = () => {
         }
     }
 
-
-
     return (
         <>
-            {!stateGlobal.user &&
+            {_.isEmpty(stateGlobal.user) &&
                 <div className="formLogin container w-50 text-center">
                     <h3 className="my-3">LOGIN</h3>
                     <Form id="loginForm" onKeyUp={(event) => handleEnter(event)}>
