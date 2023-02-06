@@ -8,22 +8,21 @@ import { $, fetchData } from '../../utils/myUtils';
 import CartBooksDetails from './library/details/cartBooksDetails';
 import { ACTION, GlobalContext } from '../../context/globalContext';
 import { useContext } from 'react';
-import { useSessionStorage } from '../../hooks/useStorage';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 
 const Header = (props) => {
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
     const navigate = useNavigate();
 
-    const [user, setUser, removeUser] = useSessionStorage('user');
-
     async function handleLogout() {
-
         let data = await fetchData('POST', 'api/logout');
-
         if (data.EC === 0) {
             window.sessionStorage.removeItem("user");
+            toast.success(data.EM);
+        } else {
+            toast.error(data.EM);
         }
 
         dispatch({ type: ACTION.GET_USER, payload: {} });

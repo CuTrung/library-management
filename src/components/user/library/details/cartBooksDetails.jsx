@@ -11,6 +11,7 @@ import { $$, fetchData } from "../../../../utils/myUtils";
 import useToggle from "../../../../hooks/useToggle";
 import { ACTION, GlobalContext } from "../../../../context/globalContext";
 import _ from 'lodash';
+import { toast } from "react-toastify";
 
 const CardBooksDetails = (props) => {
     const [listCart, setListCart] = useState([]);
@@ -46,13 +47,11 @@ const CardBooksDetails = (props) => {
         }
 
         if (bookIdsBorrowed.length > MAX_BOOKS_CAN_BORROW) {
-            alert(`Bạn chỉ được mượn tối đa ${MAX_BOOKS_CAN_BORROW} cuốn`);
-            return;
+            return toast.error(`Bạn chỉ được mượn tối đa ${MAX_BOOKS_CAN_BORROW} cuốn`);
         }
 
         if (bookIdsBorrowed.length === 0) {
-            alert(`Bạn chưa chọn sách muốn mượn`);
-            return;
+            return toast.error(`Bạn chưa chọn sách muốn mượn`);;
         }
 
         setIsDisabled(true);
@@ -60,14 +59,15 @@ const CardBooksDetails = (props) => {
 
         if (data.EC === 0 || data.EC === 1) {
             if (data.EC === 1) {
-                alert("Bạn đã đăng kí mượn tối đa, ko thể mượn thêm");
-                setIsDisabled(false);
-                return;
+                return toast.error(data.EM);
             }
             resetCheckedCart();
             setListCart(itemRemaining);
-            setIsDisabled(false);
+            toast.success(data.EM);
+        } else {
+            toast.error(data.EM);
         }
+        setIsDisabled(false);
     }
 
 
@@ -79,11 +79,11 @@ const CardBooksDetails = (props) => {
 
             return currentList;
         });
+        toast.success("Add this book successful !");
     }
 
     useEffect(() => {
         dispatch({ type: ACTION.ADD_FN_PUSH_TO_CART, payload: pushToCart })
-
     }, [])
 
     return (

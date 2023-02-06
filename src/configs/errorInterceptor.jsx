@@ -14,8 +14,13 @@ const errorInterceptor = (error) => {
             break
 
         case 401: // authentication error, logout the user
-            console.log('📡 API | Please login again', 'Session Expired')
-            localStorage.removeItem('user')
+            console.log('📡 API | Please login again', 'Authenticated failed')
+            window.sessionStorage.removeItem('user')
+            if (error.response.data.EC === -999) {
+                console.log('📡 API | Please login again', 'Token Expired')
+                window.sessionStorage.setItem("token-expired", true);
+                window.location.href = "/login";
+            }
             break
 
         case 403:

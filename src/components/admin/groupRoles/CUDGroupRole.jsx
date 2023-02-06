@@ -3,11 +3,12 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ListGroupGroupRoles from './listGroupRoles';
 import { useState, useEffect, useRef, useMemo, useContext } from 'react';
-import { $$, fetchData } from '../../../utils/myUtils';
+import { $$, fetchData, removeIsInvalidClass } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
 import useToggle from '../../../hooks/useToggle';
 import { MdDeleteForever } from 'react-icons/md';
+import { toast } from 'react-toastify';
 
 
 
@@ -63,7 +64,6 @@ const CUDGroupRole = (props) => {
     }
 
     async function handleDelete(type, id, groupRoleId) {
-
         let data = await fetchData('DELETE', 'api/groupRoles', {
             id,
             isGroup: type === 'ROLE MAIN' ? undefined : (type === 'ROLE' ? false : true),
@@ -74,9 +74,6 @@ const CUDGroupRole = (props) => {
             listGroupRolesRef.current?.fetchListGroupRoles();
             await getRoles();
         }
-
-
-
     }
 
     function handleSelectGroup(groupId) {
@@ -102,10 +99,9 @@ const CUDGroupRole = (props) => {
         e?.preventDefault();
 
         // validate
-        // let isValid = validationUtils.validate('upsertForm');
-        // if (!isValid) return;
+        let isValid = validationUtils.validate('upsertForm');
+        if (!isValid) return;
 
-        // Create with form
         let data;
         if (type === 'ROLE') {
             data = await fetchData('POST', 'api/groupRoles', {
@@ -127,24 +123,20 @@ const CUDGroupRole = (props) => {
                 listGroupRoles: dataGroupRoles,
                 groupId: group.current.value
             })
-
         }
 
         if (data.EC === 0) {
             listGroupRolesRef?.current?.fetchListGroupRoles();
             await getRoles();
-
             handleClearForm();
-            setIsDisabled(false);
+            toast.success(data.EM);
+        } else {
+            toast.success(data.EM);
         }
-
+        setIsDisabled(false);
     }
 
-    function handleOnChange(event) {
-        if (event.target.classList.contains('is-invalid')) {
-            event.target.classList.remove('is-invalid')
-        }
-    }
+
 
     useEffect(() => {
         if (!_.isEmpty(groupRoleUpdate)) {
@@ -182,7 +174,7 @@ const CUDGroupRole = (props) => {
                         >
                             <Form.Control
                                 ref={urlOrName} name='urlOrName' type="text" placeholder="name@example.com"
-                                onChange={(e) => handleOnChange(e)} />
+                                onChange={(e) => removeIsInvalidClass(e)} />
                         </FloatingLabel>
 
                         <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'

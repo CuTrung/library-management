@@ -62,7 +62,6 @@ const IndexHistories = (props) => {
             }
 
 
-
             <Table className='my-3' bordered hover>
                 <thead>
                     <tr>

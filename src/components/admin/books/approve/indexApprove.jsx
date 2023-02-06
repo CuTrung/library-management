@@ -7,6 +7,7 @@ import useToggle from "../../../../hooks/useToggle";
 import { useNavigate } from "react-router-dom";
 import { ACTION, GlobalContext } from "../../../../context/globalContext";
 import '../../../../assets/scss/admin/books/approve/indexApprove.scss';
+import { toast } from "react-toastify";
 
 // BUGS: Đang call api DELETE liên tục, chỉ call api delete khi ở component approve
 const IndexApprove = (props) => {
@@ -17,7 +18,6 @@ const IndexApprove = (props) => {
     const listStudentsRef = useRef(null);
     const [minutesClearBook, setMinutesClearBook] = useState(1);
     const [showListBorrowed, toggleShowListBorrowed] = useToggle(false);
-    const navigate = useNavigate();
     const [isDisabled, setIsDisabled] = useState(false);
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
@@ -44,9 +44,7 @@ const IndexApprove = (props) => {
         let data = await fetchData('GET', `api/histories?limit=${limitItem}&page=${currentPage}`)
         if (data.EC === 0 || data.EC === 1) {
             listStudentsRef.current = data.DT.histories;
-
             dispatch({ type: ACTION.SET_DATA_LIST_HISTORIES, payload: data.DT.histories })
-
             setListStudents(data.DT.histories);
             setTotalPages(data.DT.totalPages);
         }
@@ -58,8 +56,11 @@ const IndexApprove = (props) => {
         let data = await fetchData('POST', 'api/histories/uptime', { id: historyId });
         if (data.EC === 0) {
             getStudents();
-            setIsDisabled(false);
+            toast.success(data.EM);
+        } else {
+            toast.error(data.EM);
         }
+        setIsDisabled(false);
     }
 
     async function deleteHistories() {

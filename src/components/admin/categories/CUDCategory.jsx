@@ -3,9 +3,10 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ListCategories from './listCategories';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { fetchData } from '../../../utils/myUtils';
+import { fetchData, removeIsInvalidClass } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
+import { toast } from 'react-toastify';
 
 
 
@@ -48,10 +49,9 @@ const CUDCategory = (props) => {
         e.preventDefault();
 
         // validate
-        // let isValid = validationUtils.validate('upsertForm');
-        // if (!isValid) return;
+        let isValid = validationUtils.validate('upsertForm');
+        if (!isValid) return;
 
-        // Create with form
         let data = await fetchData('POST', 'api/categories', {
             name: name.current.value,
             isBorrowed: isBorrowed.current.checked ? '0' : '1',
@@ -61,9 +61,11 @@ const CUDCategory = (props) => {
         if (data.EC === 0) {
             listCategoriesRef.current.fetchListCategories();
             handleClearForm();
-            setIsDisabled(false)
+            toast.success(data.EM);
+        } else {
+            toast.error(data.EM);
         }
-
+        setIsDisabled(false);
     }
 
     async function deleteCategory(id) {
@@ -73,13 +75,6 @@ const CUDCategory = (props) => {
             listCategoriesRef.current.fetchListCategories();
         }
     }
-
-    function handleOnChange(event) {
-        if (event.target.classList.contains('is-invalid')) {
-            event.target.classList.remove('is-invalid')
-        }
-    }
-
 
     useEffect(() => {
         if (!_.isEmpty(categoryUpdate)) {
@@ -102,7 +97,7 @@ const CUDCategory = (props) => {
                     >
                         <Form.Control
                             ref={name} name='name' type="text" placeholder="name@example.com"
-                            onChange={(e) => handleOnChange(e)} />
+                            onChange={(e) => removeIsInvalidClass(e)} />
                     </FloatingLabel>
 
                     <Form.Check

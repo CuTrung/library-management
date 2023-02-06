@@ -85,8 +85,14 @@ const $$ = (classOrId) => {
     return document.querySelectorAll(classOrId);
 }
 
+function removeIsInvalidClass(event) {
+    if (event.target.classList.contains('is-invalid')) {
+        event.target.classList.remove('is-invalid')
+    }
+}
+
 export {
     fetchData, currencyVND, removeDiacritics, sortList, $, $$,
     convertTimeStringToSecond, getSecondsCurrent, getCurrentDate,
-    toBase64
+    toBase64, removeIsInvalidClass
 }

@@ -12,6 +12,7 @@ import { FaEyeSlash, FaEye } from 'react-icons/fa';
 import { ACTION, GlobalContext } from "../../context/globalContext";
 import { fetchData } from "../../utils/myUtils";
 import _ from 'lodash';
+import { toast } from "react-toastify";
 
 const Register = (props) => {
 
@@ -21,23 +22,23 @@ const Register = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [isWaiting, setIsWaiting] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(false);
     const navigate = useNavigate();
-    const { stateGlobal, dispatch } = useContext(GlobalContext);
 
     const handleClearForm = () => {
         setFullName('');
-        setClassRoom();
+        setClassRoom('');
         setEmail('');
         setPassword('');
     }
 
 
-    const handleRegister = async () => {
+    const handleRegister = async (e) => {
+        e?.preventDefault();
         try {
-            // let isValid = validationUtils.validate("registerForm");
-            if (true) {
-                // setIsWaiting(true);
+            let isValid = validationUtils.validate("registerForm");
+            if (isValid) {
+                setIsDisabled(true);
                 let data = await fetchData('POST', 'api/register', {
                     fullName,
                     classRoom,
@@ -46,32 +47,26 @@ const Register = (props) => {
                 })
 
                 if (data && data.EC === 0) {
-                    // toast.success(data.EM);
                     handleClearForm();
+                    navigate('/login');
+                    toast.success(data.EM);
                 } else {
-                    // setIsWaiting(false);
-                    // toast.error(data.EM);
+                    toast.error(data.EM);
                 }
+                setIsDisabled(false);
             }
         } catch (error) {
-            // toast.error("Some thing wrongs on client...");
+            toast.error("Some thing wrongs on client...");
             console.log(error);
         }
     }
-
-    const handleEnter = (event) => {
-        if (event.key === "Enter") {
-            handleRegister();
-        }
-    }
-
 
 
     return (
         <>
             <div className="formRegister container w-50 text-center">
                 <h3 className="my-3">REGISTER</h3>
-                <Form id="registerForm" onKeyUp={(event) => handleEnter(event)}>
+                <Form id="registerForm" onSubmit={(e) => handleRegister(e)}>
                     <span className="d-flex gap-3 mb-3">
                         <FloatingLabel
                             controlId="floatingInput"
@@ -84,14 +79,14 @@ const Register = (props) => {
                                 name='fullName'
                                 value={fullName}
                                 onChange={(event) => setFullName(event.target.value)}
-                            // onChange={(event) => handleOnChange(event)}
                             />
                         </FloatingLabel>
 
-                        <Form.Select value={classRoom} className="w-25" aria-label="Default select example"
+                        <Form.Select value={classRoom} name="classRoom"
+                            className="w-25" aria-label="Default select example"
                             onChange={(event) => setClassRoom(event.target.value)}
                         >
-                            <option hidden>ClassRoom</option>
+                            <option hidden value=''>ClassRoom</option>
                             <option value="CD21CT2">CD21CT2</option>
                             <option value="CD21LM2">CD21LM2</option>
                             <option value="CD21DH2">CD21DH2</option>
@@ -110,7 +105,6 @@ const Register = (props) => {
                             name='email'
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
-                        // onChange={(event) => handleOnChange(event)}
                         />
                     </FloatingLabel>
 
@@ -125,7 +119,6 @@ const Register = (props) => {
                             name='password'
                             value={password}
                             onChange={(event) => setPassword(event.target.value)}
-                        // onChange={(event) => handleOnChange(event)}
                         />
                         <span onClick={() => setShowPassword(!showPassword)} className="eye me-3 position-absolute top-50 end-0 translate-middle-y">
                             {showPassword ?
@@ -136,14 +129,11 @@ const Register = (props) => {
                         </span>
                     </FloatingLabel>
 
-
-
-                    {/* <button type="button" className="btn btn-primary w-100">Register</button> */}
-                    <Button disabled={isWaiting} className='btn w-100 mb-3' variant="primary" type="button" onClick={() => handleRegister()}>
+                    <Button disabled={isDisabled} className='btn w-100 mb-3' variant="primary" type="submit">
                         Register
                     </Button>
                 </Form>
-                <div className="goHome mt-3" >
+                <div className="goHome mt-3 " >
                     <Link to="/"><MdArrowBack />Go to homepage</Link>
                 </div>
             </div>
