@@ -10,13 +10,12 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import validationUtils from "../../utils/validationUtils";
 import { FaEyeSlash, FaEye } from 'react-icons/fa';
 import { ACTION, GlobalContext } from "../../context/globalContext";
-import { fetchData } from "../../utils/myUtils";
+import { fetchData, removeIsInvalidClass } from "../../utils/myUtils";
 import _ from 'lodash';
 import { toast } from "react-toastify";
 
 const Register = (props) => {
 
-    const EMAIL_ADMIN = import.meta.env.VITE_EMAIL_ADMIN;
     const [fullName, setFullName] = useState("");
     const [classRoom, setClassRoom] = useState("");
     const [email, setEmail] = useState("");
@@ -78,13 +77,19 @@ const Register = (props) => {
                                 placeholder="name@example.com"
                                 name='fullName'
                                 value={fullName}
-                                onChange={(event) => setFullName(event.target.value)}
+                                onChange={(event) => {
+                                    setFullName(event.target.value);
+                                    removeIsInvalidClass(event);
+                                }}
                             />
                         </FloatingLabel>
 
                         <Form.Select value={classRoom} name="classRoom"
                             className="w-25" aria-label="Default select example"
-                            onChange={(event) => setClassRoom(event.target.value)}
+                            onChange={(event) => {
+                                setClassRoom(event.target.value);
+                                removeIsInvalidClass(event);
+                            }}
                         >
                             <option hidden value=''>ClassRoom</option>
                             <option value="CD21CT2">CD21CT2</option>
@@ -104,7 +109,10 @@ const Register = (props) => {
                             placeholder="name@example.com"
                             name='email'
                             value={email}
-                            onChange={(event) => setEmail(event.target.value)}
+                            onChange={(event) => {
+                                setEmail(event.target.value);
+                                removeIsInvalidClass(event);
+                            }}
                         />
                     </FloatingLabel>
 
@@ -118,7 +126,10 @@ const Register = (props) => {
                             placeholder="name@example.com"
                             name='password'
                             value={password}
-                            onChange={(event) => setPassword(event.target.value)}
+                            onChange={(event) => {
+                                setPassword(event.target.value);
+                                removeIsInvalidClass(event);
+                            }}
                         />
                         <span onClick={() => setShowPassword(!showPassword)} className="eye me-3 position-absolute top-50 end-0 translate-middle-y">
                             {showPassword ?
