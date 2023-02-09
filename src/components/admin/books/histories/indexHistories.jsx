@@ -3,9 +3,11 @@ import { useLocation } from "react-router-dom";
 import SearchBar from "../../../both/searchBar";
 import Table from 'react-bootstrap/Table';
 
-import { CiExport } from "react-icons/ci";
+import { FcDownload } from "react-icons/fc";
 import { useContext } from "react";
 import { GlobalContext } from "../../../../context/globalContext";
+import { toast } from "react-toastify";
+import { exportExcel } from "../../../../utils/myUtils";
 
 
 const IndexHistories = (props) => {
@@ -29,10 +31,35 @@ const IndexHistories = (props) => {
         return false;
     }
 
-    // Export file excel (Coming soon ...)
-    function handleExport() {
-        console.log("export");
 
+    // Export file excel
+    function handleExport() {
+        if (listHistories.length === 0)
+            return toast.error("List histories is empty! Can't export !");
+
+        let listHistoriesExport = listHistories.map((item) => {
+            return {
+                fullName: item.Student.fullName,
+                name: item.Book.name,
+                quantityBorrowed: item.Book.quantityBorrowed,
+                price: item.Book.price,
+                timeStart: item.timeStart,
+                timeEnd: item.timeEnd,
+            }
+        });
+
+
+        const isSuccess = exportExcel({
+            listData: listHistoriesExport,
+            listHeadings: [
+                'Họ tên', 'Tên sách mượn', 'Số lượng mượn', 'Giá', 'Ngày mượn', 'Ngày trả'
+            ],
+            nameFile: 'List Student borrowed'
+        });
+        if (isSuccess)
+            return toast.success("Export excel successful!")
+
+        toast.error("Export excel failed!")
     }
 
     useEffect(() => {
@@ -48,7 +75,7 @@ const IndexHistories = (props) => {
 
             <button className="btn btn-outline-success float-end ms-3"
                 onClick={() => handleExport()}
-            >Export excel <CiExport size={24} /></button>
+            >Export excel <FcDownload size={30} /></button>
 
             {stateGlobal.dataListHistories?.length > 0 &&
                 <SearchBar
@@ -68,9 +95,8 @@ const IndexHistories = (props) => {
                         <th>
                             Full Name
                         </th>
-                        <th>Quantity Borrowed</th>
                         <th>Book Borrowed</th>
-                        <th>Is Borrowed</th>
+                        <th>Quantity Borrowed</th>
                         <th>Price</th>
                         <th>Time Start</th>
                         <th>Time End</th>
@@ -82,15 +108,13 @@ const IndexHistories = (props) => {
                             return (
                                 // Có trường hợp timeEnd === null và timeStart cũng === null, nên phải ẩn nó đi (d-none) vì chưa kịp xóa tự động
                                 item.timeStart !== null &&
-                                <tr key={`history-${index}`} className={`${isOutOfDate(item.timeStart) ? 'table-danger' : ''}`}>
+                                <tr key={`history-${index}`} className={`${isOutOfDate(item.timeStart) && !item.timeEnd ? 'table-danger' : ''}`}>
                                     <td>{item.Student.fullName}</td>
-                                    <td>{item.Book.quantityBorrowed}</td>
                                     <td>{item.Book.name}</td>
-                                    <td>{item.Book.categories.some(item => item.isBorrowed === 0) ? `Chỉ đọc tại chỗ` : 'Được mượn về'}</td>
+                                    <td>{item.Book.quantityBorrowed}</td>
                                     <td>{item.Book.price}</td>
                                     <td>{item.timeStart}</td>
                                     <td>{item.timeEnd}</td>
-
                                 </tr>
                             )
                         })

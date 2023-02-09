@@ -1,5 +1,5 @@
 import axios from "../configs/axios";
-
+import { read, utils, writeFile, readFile, writeFileXLSX } from 'xlsx';
 
 const fetchData = async (method, url, payload) => {
     let data = null;
@@ -50,7 +50,7 @@ const sortList = (listSort, key, type = 'ASC') => {
 }
 
 const convertTimeStringToSecond = (timeString) => {
-    let time = timeString.split(":");
+    let time = timeString.split(" ")[0].split(":");
     return +time[0] * 3600 + +time[1] * 60 + +time[2];
 }
 
@@ -91,8 +91,44 @@ function removeIsInvalidClass(event) {
     }
 }
 
+const upperCaseFirstChar = (str) => {
+    return str.charAt(0).toUpperCase() + str.toLowerCase().slice(1);
+}
+
+const exportExcel = ({ listData, listHeadings, nameFile }) => {
+    let isSuccess = false;
+    try {
+        const ws = utils.json_to_sheet(listData);
+        const wb = utils.book_new();
+        utils.sheet_add_aoa(ws, [listHeadings]);
+        utils.book_append_sheet(wb, ws, "Data");
+        writeFileXLSX(wb, `${nameFile}.xlsx`);
+        isSuccess = true;
+    } catch (error) {
+        console.log(error);
+    }
+    return isSuccess;
+}
+
+const importExcel = async (file) => {
+    return new Promise((resolve) => {
+        const fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(file);
+        fileReader.onload = (e) => {
+            const bufferArray = e?.target.result;
+            const wb = read(bufferArray, { type: "buffer" });
+            const wsname = wb.SheetNames[0];
+            const ws = wb.Sheets[wsname];
+            const fileName = file.name.split(".")[0];
+            let data = utils.sheet_to_json(ws);
+            resolve(data);
+        }
+    })
+
+}
+
 export {
     fetchData, currencyVND, removeDiacritics, sortList, $, $$,
     convertTimeStringToSecond, getSecondsCurrent, getCurrentDate,
-    toBase64, removeIsInvalidClass
+    toBase64, removeIsInvalidClass, upperCaseFirstChar, exportExcel, importExcel
 }

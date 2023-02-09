@@ -73,6 +73,8 @@ const IndexApprove = (props) => {
             }
         })
 
+
+
         let data = await fetchData('DELETE', 'api/histories', { id: historyIdsDelete })
 
         return data;
@@ -86,7 +88,7 @@ const IndexApprove = (props) => {
                 resolve(
                     await deleteHistories()
                 )
-            }, true ? 2000 : minutesClearBook * 60000)
+            }, minutesClearBook * 60000)
         }).then(async (res) => {
             if (res.DT > 0)
                 await getStudents();
@@ -97,9 +99,10 @@ const IndexApprove = (props) => {
         getStudents();
     }, [currentPage])
 
-    // useEffect(() => {
-    //     handleClearBook();
-    // }, [])
+    useEffect(() => {
+        handleClearBook();
+    }, [])
+
 
     return (
         <>
@@ -156,7 +159,7 @@ const IndexApprove = (props) => {
                                     <td>{item.Student.fullName}</td>
                                     <td>{item.Book.quantityBorrowed}</td>
                                     <td>{item.Book.name}</td>
-                                    <td>{item.Book.categories.some(item => item.isBorrowed === 0) ? `Chỉ đọc tại chỗ` : 'Được mượn về'}</td>
+                                    <td className={`${item.Book.categories.some(item => item.isBorrowed === 0) ? `fw-bold text-danger` : ''}`}>{item.Book.categories.some(item => item.isBorrowed === 0) ? `Chỉ đọc tại chỗ` : 'Được mượn về'}</td>
 
                                     <td>
                                         <button className={`btn btn-${listApproveBorrowed.buttonColor}`}

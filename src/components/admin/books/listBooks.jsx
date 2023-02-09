@@ -7,6 +7,8 @@ import '../../../assets/scss/admin/books/listBooks.scss';
 import Sorting from '../../both/sorting';
 import SearchBar from '../../both/searchBar';
 import LoadingIcon from '../../both/loadingIcon';
+import { useContext } from 'react';
+import { ACTION, GlobalContext } from '../../../context/globalContext';
 
 
 const ListBooks = (props, ref) => {
@@ -15,6 +17,7 @@ const ListBooks = (props, ref) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(null);
     const listBooksRef = useRef(null);
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
 
     async function getBooks() {
         let data = await fetchData('GET', `api/books?limit=${limitItem}&page=${currentPage}`)
@@ -22,6 +25,7 @@ const ListBooks = (props, ref) => {
             listBooksRef.current = data.DT.books;
             setListBooks(data.DT.books);
             setTotalPages(data.DT.totalPages);
+            dispatch({ type: ACTION.SET_SAMPLE_BOOKS, payload: data.DT.books })
         }
     }
 

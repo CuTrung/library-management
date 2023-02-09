@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ListCategories from './listCategories';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { fetchData, removeIsInvalidClass } from '../../../utils/myUtils';
+import { fetchData, removeIsInvalidClass, upperCaseFirstChar } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
 import { toast } from 'react-toastify';
@@ -53,7 +53,7 @@ const CUDCategory = (props) => {
         if (!isValid) return;
 
         let data = await fetchData('POST', 'api/categories', {
-            name: name.current.value,
+            name: upperCaseFirstChar(name.current.value),
             isBorrowed: isBorrowed.current.checked ? '0' : '1',
             id: categoryUpdate.id,
         })

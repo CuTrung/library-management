@@ -11,7 +11,8 @@ const ACTION = {
     SET_DATA_BOOK_BORROWED: 'SET_DATA_BOOK_BORROWED',
     SET_DATA_LIST_HISTORIES: 'SET_DATA_LIST_HISTORIES',
     GET_BOOKS_HOME_LIBRARY: 'GET_BOOKS_HOME_LIBRARY',
-    SET_CATEGORY_IDS_CONTENT_LIBRARY: 'SET_CATEGORY_IDS_CONTENT_LIBRARY'
+    SET_CATEGORY_IDS_CONTENT_LIBRARY: 'SET_CATEGORY_IDS_CONTENT_LIBRARY',
+    SET_SAMPLE_BOOKS: 'SET_SAMPLE_BOOKS'
 }
 
 
@@ -29,6 +30,8 @@ function reducer(state, action) {
             return { ...state, fnGetBooksHomeLibrary: action.payload };
         case ACTION.SET_CATEGORY_IDS_CONTENT_LIBRARY:
             return { ...state, dataCategory: action.payload };
+        case ACTION.SET_SAMPLE_BOOKS:
+            return { ...state, listBooksSample: action.payload };
         default:
             throw new Error();
     }

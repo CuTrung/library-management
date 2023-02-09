@@ -3,11 +3,11 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ListBooks from './listBooks';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { fetchData, removeIsInvalidClass, toBase64 } from '../../../utils/myUtils';
+import { exportExcel, fetchData, importExcel, removeIsInvalidClass, toBase64 } from '../../../utils/myUtils';
 import _ from "lodash";
 import validationUtils from '../../../utils/validationUtils';
 import '../../../assets/scss/admin/books/CUDBook.scss';
-import { FcUpload } from "react-icons/fc";
+import { FcUpload, FcDownload } from "react-icons/fc";
 import { BsCardImage } from "react-icons/bs";
 import { useContext } from 'react';
 import { GlobalContext } from '../../../context/globalContext';
@@ -31,6 +31,8 @@ const CUDBook = (props) => {
     const price = useRef("");
     const quantity = useRef("");
     const status = useRef("");
+
+    const { stateGlobal, dispatch } = useContext(GlobalContext);
 
     const [bookUpdate, setBookUpdate] = useState({});
     const upsertForm = useMemo(() => {
@@ -85,44 +87,48 @@ const CUDBook = (props) => {
 
         e.preventDefault();
 
-        // Upload file with excel (Coming soon ...)
-        let file = document.getElementById('fileUpload').files[0];
-
+        if (fileName.split(".")[1] !== 'xlsx') return toast.error("The file must be have extension 'xlsx' !")
 
         // validate
-        let isValid = validationUtils.validate('upsertForm');
+        let isValid = fileName ? true : validationUtils.validate('upsertForm');
         if (!isValid) return;
 
-        // Create with form
-        let categoryIds = [];
-        for (const item of document.querySelectorAll('[name="category"]')) {
-            if (item.checked) {
-                categoryIds.push(item.value)
+        // Upload file with excel 
+        let listBooksImport;
+        let categoryIds = [], imgBase64;
+        if (fileName) {
+            let file = document.getElementById('fileUpload').files[0];
+            listBooksImport = await importExcel(file);
+            listBooksImport = listBooksImport.map((item) => ({ ...item, rowNum: item.__rowNum__ }))
+        } else {
+            // Create with form
+            for (const item of document.querySelectorAll('[name="category"]')) {
+                if (item.checked) {
+                    categoryIds.push(item.value)
+                }
             }
+            imgBase64 = image ? await toBase64(image) : null;
         }
 
-
-        let imgBase64 = image ? await toBase64(image) : null;
         setIsDisabled(true);
-        let data = await fetchData('POST', 'api/books', {
+        let data = await fetchData('POST', 'api/books', !fileName ? {
             name: name.current.value,
             price: price.current.value,
             quantity: quantity.current.value,
             statusId: status.current.value,
-            id: bookUpdate.id,
             categoryIds: categoryIds,
-            image: imgBase64
-        })
+            image: imgBase64,
+            id: bookUpdate.id,
+        } : listBooksImport)
 
         if (data.EC === 0) {
             listBooksRef.current.fetchListBooks();
-            handleClearForm();
-            setIsDisabled(false);
             toast.success(data.EM);
         } else {
-            setIsDisabled(false);
             toast.error(data.EM);
         }
+        setIsDisabled(false);
+        handleClearForm();
 
     }
 
@@ -136,7 +142,31 @@ const CUDBook = (props) => {
         }
     }
 
+    function handleDownloadExcel() {
+        // Lấy 3 books để làm sample
+        let listBooksSample = stateGlobal.listBooksSample.slice(0, 3).map((item) => {
+            return {
+                name: item.name,
+                category: item.Categories[0].name,
+                price: item.price,
+                quantity: item.quantity,
+                status: item.Status.name,
+            }
+        });
 
+        // listHeadings phải theo thứ tự key như listData
+        const isSuccess = exportExcel({
+            listData: listBooksSample,
+            listHeadings: [
+                'Tên', 'Thể loại', 'Giá', 'Số lượng', 'Tình trạng'
+            ],
+            nameFile: 'BooksSample'
+        });
+        if (isSuccess)
+            return toast.success("Export excel successful!")
+
+        toast.error("Export excel failed!")
+    }
 
     function checkedCategoriesUpdate() {
         for (const item of document.querySelectorAll('[name="category"]')) {
@@ -184,12 +214,22 @@ const CUDBook = (props) => {
 
                 <h3 className='mb-4'>{upsertForm.header}</h3>
 
-                <input onChange={(e) => setFileName(e.target.files[0].name)} id='fileUpload' type="file" multiple hidden />
-                <label
-                    htmlFor='fileUpload'
-                    className={`btn btn-outline-secondary position-absolute top-0 end-0 border border-2 border-${fileName ? 'success' : 'dark'} me-5 p-1`}
-                >{fileName ?? 'Upload excel'} <FcUpload size={'34px'} />
-                </label>
+                <div className='position-absolute top-0 end-0'>
+                    <button
+                        type='button'
+                        onClick={() => handleDownloadExcel()}
+                        className={`btn btn-outline-secondary  border border-2 border-primary me-3 p-1`}
+                    >{'Sample excel'} <FcDownload size={'34px'} />
+                    </button>
+
+                    <input onChange={(e) => setFileName(e.target.files[0].name)} id='fileUpload' type="file" hidden />
+                    <label
+                        htmlFor='fileUpload'
+                        className={`btn btn-outline-secondary  border border-2 border-${fileName ? 'success' : 'dark'} me-5 p-1`}
+                    >{fileName ?? 'Upload excel'} <FcUpload size={'34px'} />
+                    </label>
+                </div>
+
 
                 <span className='d-flex gap-2'>
                     <FloatingLabel

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext } from "react";
+import { useState, useEffect, useCallback, useContext, useRef } from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FaShoppingCart } from 'react-icons/fa';
@@ -12,6 +12,9 @@ import useToggle from "../../../../hooks/useToggle";
 import { ACTION, GlobalContext } from "../../../../context/globalContext";
 import _ from 'lodash';
 import { toast } from "react-toastify";
+import { AiFillMinusCircle, AiFillPlusCircle } from 'react-icons/ai';
+import { BsBookmarkDashFill } from "react-icons/bs";
+
 
 const CardBooksDetails = (props) => {
     const [listCart, setListCart] = useState([]);
@@ -32,12 +35,16 @@ const CardBooksDetails = (props) => {
     }
 
     async function handleConfirm() {
-        if (_.isEmpty(stateGlobal.user)) return navigate('/login')
+        if (_.isEmpty(stateGlobal.user)) return navigate('/login');
 
-        let bookIdsBorrowed = [], itemRemaining = [];
+        let dataBorrowed = [], itemRemaining = [], totalQuantity = 0;
         for (const item of $$('[type="checkbox"]')) {
             if (item.checked) {
-                bookIdsBorrowed.push(item.getAttribute('data-id'));
+                dataBorrowed.push({
+                    bookIdBorrowed: +item.getAttribute('data-id'),
+                    quantityBookBorrowed: +item.getAttribute('data-quantity')
+                });
+                totalQuantity += +item.getAttribute('data-quantity');
             } else {
                 listCart.forEach((itemCart) => {
                     if (+itemCart.id === +item.getAttribute('data-id'))
@@ -46,19 +53,20 @@ const CardBooksDetails = (props) => {
             }
         }
 
-        if (bookIdsBorrowed.length > MAX_BOOKS_CAN_BORROW) {
+        if (dataBorrowed.length > MAX_BOOKS_CAN_BORROW || totalQuantity > MAX_BOOKS_CAN_BORROW) {
             return toast.error(`Bạn chỉ được mượn tối đa ${MAX_BOOKS_CAN_BORROW} cuốn`);
         }
 
-        if (bookIdsBorrowed.length === 0) {
+        if (dataBorrowed.length === 0) {
             return toast.error(`Bạn chưa chọn sách muốn mượn`);;
         }
 
         setIsDisabled(true);
-        let data = await fetchData('POST', `api/histories`, { bookIdsBorrowed })
+        let data = await fetchData('POST', `api/histories`, { dataBorrowed })
 
         if (data.EC === 0 || data.EC === 1) {
             if (data.EC === 1) {
+                setIsDisabled(false);
                 return toast.error(data.EM);
             }
             resetCheckedCart();
@@ -72,14 +80,49 @@ const CardBooksDetails = (props) => {
 
 
     function pushToCart(book) {
+        let maxQuantityBookCanBorrowed = +book.quantity - +book.borrowed;
         setListCart((currentList) => {
-            if (currentList.length === 0 || currentList.findIndex((item) => +item.id === +book.id) === -1) {
-                return [...currentList, book];
+            let startItem = _.cloneDeep(book);
+            let itemIndex = currentList.findIndex((item) => +item.id === +book.id)
+            if (itemIndex > -1) {
+                // Vượt quá giới hạn số lượng sách hiện có
+                if (+currentList[itemIndex].quantity >= maxQuantityBookCanBorrowed) {
+                    toast.error("Đã vượt quá số sách hiện có !");
+                    return currentList;
+                }
+
+                currentList[itemIndex].quantity = +currentList[itemIndex].quantity + 1;
+                toast.success("Add book successful !");
+                return currentList;
+            } else {
+                startItem.quantity = 1;
             }
 
-            return currentList;
+            toast.success("Add book successful !");
+            return [...currentList, startItem];
         });
-        toast.success("Add this book successful !");
+
+    }
+
+    function handleChangeQuantity(type, book) {
+        let maxQuantityCanBorrowed = +stateGlobal.dataBookBorrowed.quantity - +stateGlobal.dataBookBorrowed.borrowed;
+        setListCart((currentList) => {
+            let itemIndex = currentList.findIndex((item) => +item.id === +book.id)
+            if (itemIndex > -1) {
+                // Số lương đã vượt quá giới hạn
+                if (type === 'INCREASE' && +currentList[itemIndex].quantity >= maxQuantityCanBorrowed) {
+                    toast.error("Đã vượt quá số sách hiện có !");
+                    return currentList;
+                }
+
+                currentList[itemIndex].quantity = +currentList[itemIndex].quantity + (type === 'INCREASE' ? 1 : -1);
+
+                currentList = currentList.filter((item) => item.quantity > 0);
+                toast.success("Remove book successful !");
+                return currentList;
+            }
+        });
+
     }
 
     useEffect(() => {
@@ -106,16 +149,29 @@ const CardBooksDetails = (props) => {
                                                     <img src={book?.image ?? `../../../../src/assets/img/default.jpg`} className="rounded-circle w-50" alt="" />
                                                 </div>
                                                 <div className="col-9 border-start border-3 border-info ">
+
                                                     <Form.Check
-                                                        className="checkBorrowed position-absolute top-0 end-0 "
+                                                        className="checkBorrowed position-absolute top-0 end-0 d-flex"
                                                         type={'checkbox'}
                                                         data-id={book.id}
+                                                        data-quantity={book.quantity}
                                                     />
+
                                                     <h5>{book.name}
                                                         <span className="badge ms-2 rounded-pill bg-info">{book.Status.name}</span>
                                                     </h5>
                                                     <p className="m-0 mb-2">{book.Categories.findIndex((item) => item.isBorrowed === 1) > -1 ? 'Được mượn về nhà' : 'Chỉ mượn tại chỗ'}</p>
-                                                    <p className="m-0">Giá: {book.price}</p>
+                                                    <p className="m-0">Giá: {book.price}
+                                                        <span className="float-end border border-2 d-flex gap-2 fs-5">
+                                                            <AiFillMinusCircle size={30} color="red"
+                                                                className="decrease"
+                                                                onClick={() => handleChangeQuantity('DECREASE', book)}
+                                                            /> {book.quantity} <AiFillPlusCircle size={30} color="green"
+                                                                className="increase"
+                                                                onClick={() => handleChangeQuantity('INCREASE', book)}
+                                                            />
+                                                        </span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </ListGroup.Item>
