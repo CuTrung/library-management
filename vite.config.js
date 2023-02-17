@@ -6,8 +6,11 @@ export default ({ mode }) => {
 
   return defineConfig({
     plugins: [react()],
-
+    base: process.env.VITE_BASENAME,
     server: {
+      port: parseInt(process.env.VITE_PORT),
+    },
+    preview: {
       port: parseInt(process.env.VITE_PORT),
     },
   });

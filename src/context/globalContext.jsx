@@ -4,7 +4,6 @@ import { createContext } from 'react';
 import { fetchData } from "../utils/myUtils";
 import { useMemo, useEffect, useState } from "react";
 
-
 const ACTION = {
     GET_USER: 'GET_USER',
     ADD_FN_PUSH_TO_CART: 'ADD_FN_PUSH_TO_CART',
@@ -12,7 +11,8 @@ const ACTION = {
     SET_DATA_LIST_HISTORIES: 'SET_DATA_LIST_HISTORIES',
     GET_BOOKS_HOME_LIBRARY: 'GET_BOOKS_HOME_LIBRARY',
     SET_CATEGORY_IDS_CONTENT_LIBRARY: 'SET_CATEGORY_IDS_CONTENT_LIBRARY',
-    SET_SAMPLE_BOOKS: 'SET_SAMPLE_BOOKS'
+    SET_SAMPLE_BOOKS: 'SET_SAMPLE_BOOKS',
+    ADD_FN_HANDLE_APPROVE: 'ADD_FN_HANDLE_APPROVE'
 }
 
 
@@ -28,10 +28,12 @@ function reducer(state, action) {
             return { ...state, dataListHistories: action.payload };
         case ACTION.GET_BOOKS_HOME_LIBRARY:
             return { ...state, fnGetBooksHomeLibrary: action.payload };
-        case ACTION.SET_CATEGORY_IDS_CONTENT_LIBRARY:
-            return { ...state, dataCategory: action.payload };
+        case ACTION.SET_DATA_FILTER_CONTENT_LIBRARY:
+            return { ...state, dataFilter: action.payload };
         case ACTION.SET_SAMPLE_BOOKS:
             return { ...state, listBooksSample: action.payload };
+        case ACTION.SET_DATA_APPROVE:
+            return { ...state, dataApprove: action.payload };
         default:
             throw new Error();
     }

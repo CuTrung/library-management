@@ -61,6 +61,7 @@ const CardBooksDetails = (props) => {
             return toast.error(`Bạn chưa chọn sách muốn mượn`);;
         }
 
+
         setIsDisabled(true);
         let data = await fetchData('POST', `api/histories`, { dataBorrowed })
 
@@ -80,7 +81,7 @@ const CardBooksDetails = (props) => {
 
 
     function pushToCart(book) {
-        let maxQuantityBookCanBorrowed = +book.quantity - +book.borrowed;
+        let maxQuantityBookCanBorrowed = +book.quantityReality - +book.borrowed;
         setListCart((currentList) => {
             let startItem = _.cloneDeep(book);
             let itemIndex = currentList.findIndex((item) => +item.id === +book.id)
@@ -105,7 +106,7 @@ const CardBooksDetails = (props) => {
     }
 
     function handleChangeQuantity(type, book) {
-        let maxQuantityCanBorrowed = +stateGlobal.dataBookBorrowed.quantity - +stateGlobal.dataBookBorrowed.borrowed;
+        let maxQuantityCanBorrowed = +stateGlobal.dataBookBorrowed.quantityReality - +stateGlobal.dataBookBorrowed.borrowed;
         setListCart((currentList) => {
             let itemIndex = currentList.findIndex((item) => +item.id === +book.id)
             if (itemIndex > -1) {
@@ -118,7 +119,7 @@ const CardBooksDetails = (props) => {
                 currentList[itemIndex].quantity = +currentList[itemIndex].quantity + (type === 'INCREASE' ? 1 : -1);
 
                 currentList = currentList.filter((item) => item.quantity > 0);
-                toast.success("Remove book successful !");
+                toast.success(`${type === 'INCREASE' ? 'Add' : 'Remove'} book successful !`);
                 return currentList;
             }
         });
@@ -146,7 +147,7 @@ const CardBooksDetails = (props) => {
                                         <ListGroup.Item key={`bookCart-${index}`} className="position-relative">
                                             <div className="row">
                                                 <div className="col-3 text-center ">
-                                                    <img src={book?.image ?? `../../../../src/assets/img/default.jpg`} className="rounded-circle w-50" alt="" />
+                                                    <img src={book?.image ?? stateGlobal.defaultImgUrl} className="rounded-circle w-50" alt="" />
                                                 </div>
                                                 <div className="col-9 border-start border-3 border-info ">
 

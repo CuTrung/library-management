@@ -2,15 +2,13 @@ import axios from 'axios';
 import errorInterceptor from './errorInterceptor';
 // Set config defaults when creating the instance
 const instance = axios.create({
-    baseURL: 'http://localhost:8080/',
+    // Config cookie can use in client
+    withCredentials: true,
+    baseURL: import.meta.env.VITE_BASE_URL_BACKEND,
 });
 
-// Config cookie can use in client
-instance.defaults.withCredentials = true;
 
-// axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
-
-// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+instance.defaults.headers.common['Authorization'] = `Bearer ${window.sessionStorage.getItem("jwt")}`;
 
 // Add a request interceptor
 instance.interceptors.request.use(function (config) {

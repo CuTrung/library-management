@@ -9,6 +9,7 @@ import validationUtils from '../../../utils/validationUtils';
 import useToggle from '../../../hooks/useToggle';
 import { MdDeleteForever } from 'react-icons/md';
 import { toast } from 'react-toastify';
+import '../../../assets/scss/admin/groupRoles/CUDGroupRole.scss';
 
 
 
@@ -29,7 +30,7 @@ const CUDGroupRole = (props) => {
 
     const [isDisabled, setIsDisabled] = useState(false);
 
-    const upsertForm = useMemo(() => {
+    const upsertGroupOrRoleForm = useMemo(() => {
         let propsForm = {
             header: `Add new ${isGroup ? 'role' : 'group'}`,
             buttonContent: 'Submit',
@@ -73,6 +74,7 @@ const CUDGroupRole = (props) => {
         if (data.EC === 0) {
             listGroupRolesRef.current?.fetchListGroupRoles();
             await getRoles();
+            toast.success(data.EM);
         }
     }
 
@@ -99,7 +101,7 @@ const CUDGroupRole = (props) => {
         e?.preventDefault();
 
         // validate
-        let isValid = validationUtils.validate('upsertForm');
+        let isValid = validationUtils.validate('upsertGroupOrRoleForm');
         if (!isValid) return;
 
         let data;
@@ -161,7 +163,7 @@ const CUDGroupRole = (props) => {
                 <div className="col-4">
                     <form id='upsertGroupOrRoleForm' onSubmit={(e) => upsertGroupRole('ROLE', e)}>
                         <h3 className='my-3'>
-                            {upsertForm.header}
+                            {upsertGroupOrRoleForm.header}
                             {_.isEmpty(groupRoleUpdate) &&
                                 <button type='button' onClick={() => handleChangeAddNew()} className='btn btn-outline-info btn-sm float-end'>Add new {isGroup ? 'group' : 'role'}</button>
                             }
@@ -177,11 +179,11 @@ const CUDGroupRole = (props) => {
                                 onChange={(e) => removeIsInvalidClass(e)} />
                         </FloatingLabel>
 
-                        <Button className={`btn-${upsertForm.buttonColor} me-3`} type='submit'
+                        <Button className={`btn-${upsertGroupOrRoleForm.buttonColor} me-3`} type='submit'
                             disabled={isDisabled}
-                        >{upsertForm.buttonContent}</Button>
+                        >{upsertGroupOrRoleForm.buttonContent}</Button>
 
-                        <Button onClick={handleClearForm} className={`btn-${upsertForm.supportButtonColor}`} type='button'>{upsertForm.supportButtonContent}</Button>
+                        <Button onClick={handleClearForm} className={`btn-${upsertGroupOrRoleForm.supportButtonColor}`} type='button'>{upsertGroupOrRoleForm.supportButtonContent}</Button>
                     </form>
 
                     <hr />

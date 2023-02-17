@@ -61,6 +61,8 @@ const Login = () => {
                     email: data.DT.email,
                 }))
 
+                window.sessionStorage.setItem("jwt", data.DT.access_token);
+
                 dispatch({
                     type: ACTION.GET_USER, payload: {
                         fullName: data.DT.fullName,

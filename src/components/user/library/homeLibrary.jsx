@@ -5,6 +5,7 @@ import { fetchData } from "../../../utils/myUtils";
 import { useContext } from "react";
 import { ACTION, GlobalContext } from "../../../context/globalContext";
 import { useRef } from "react";
+import _ from "lodash";
 
 
 const HomeLibrary = (props) => {
@@ -15,23 +16,24 @@ const HomeLibrary = (props) => {
     const [totalPages, setTotalPages] = useState(null);
     const listBooksRef = useRef([]);
     const listBooksCarouselRef = useRef([]);
+    const [listMajorsByDepartment, setListMajorsByDepartment] = useState([]);
+
 
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
 
 
-    async function getBooks(categoryIds) {
-
+    async function getBooks(listFilters) {
         let data;
-        if (categoryIds) {
-            data = await fetchData('GET', `api/books/categoryIds?limit=${limitItem}&page=${currentPage}`, { categoryIds });
+        if (!_.isEmpty(listFilters)) {
+            data = await fetchData('GET', `api/books/filter?limit=${limitItem}&page=${currentPage}`, { listFilters });
         } else {
             data = await fetchData("GET", `api/books?limit=${limitItem}&page=${currentPage}`);
         }
 
         if (data.EC === 0) {
             listBooksRef.current = data.DT.books;
-            if (!categoryIds) {
+            if (_.isEmpty(listFilters)) {
                 listBooksCarouselRef.current = data.DT.books;
             }
             setListBooks(data.DT.books);
@@ -41,10 +43,20 @@ const HomeLibrary = (props) => {
         }
     }
 
+    async function handleSelect(type, value) {
+        if (type === 'DEPARTMENT') {
+            let data = await fetchData('GET', 'api/majors', { departmentId: value })
+
+            if (data.EC === 0) {
+                setListMajorsByDepartment(data.DT);
+            }
+        }
+    }
+
 
 
     useEffect(() => {
-        getBooks(stateGlobal.dataCategory?.categoryIds);
+        getBooks(stateGlobal.dataFilter);
     }, [currentPage]);
 
     return (
@@ -56,9 +68,11 @@ const HomeLibrary = (props) => {
                 listBooks={listBooks}
                 setListBooks={setListBooks}
                 listBooksRef={listBooksRef.current}
+                handleSelect={handleSelect}
 
                 totalPages={totalPages}
                 setCurrentPage={setCurrentPage}
+                listMajorsByDepartment={listMajorsByDepartment}
             />
         </>
     );

@@ -8,15 +8,15 @@ import { useEffect } from 'react';
 import { useSessionStorage } from './hooks/useStorage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useMemo } from 'react';
 
 function App() {
 
-
+  const defaultImgUrl = useMemo(() => new URL('./assets/img/default.jpg', import.meta.url).href, []);
 
   return (
     <>
-      <GlobalContextProvider initValue={{ user: JSON.parse(window.sessionStorage.getItem("user") ?? '{}') }}>
+      <GlobalContextProvider initValue={{ user: JSON.parse(window.sessionStorage.getItem("user") ?? '{}'), defaultImgUrl }}>
 
         <div className="App">
           <div className='header'>

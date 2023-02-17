@@ -45,13 +45,14 @@ const CUDCategory = (props) => {
 
 
     async function upsertCategory(e) {
-        setIsDisabled(true);
+
         e.preventDefault();
 
         // validate
-        let isValid = validationUtils.validate('upsertForm');
+        let isValid = validationUtils.validate('upsertForm', 'name');
         if (!isValid) return;
 
+        setIsDisabled(true);
         let data = await fetchData('POST', 'api/categories', {
             name: upperCaseFirstChar(name.current.value),
             isBorrowed: isBorrowed.current.checked ? '0' : '1',

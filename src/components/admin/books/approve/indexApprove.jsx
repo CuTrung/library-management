@@ -22,23 +22,6 @@ const IndexApprove = (props) => {
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
 
-    const listApproveBorrowed = useMemo(() => {
-        let propsList = {
-            header: 'List approve',
-            buttonChangeContent: 'List borrowed',
-            buttonContent: 'Approve',
-            buttonColor: 'info',
-            supportButtonContent: 'Approve',
-        }
-        if (showListBorrowed) {
-            propsList.header = 'List borrowed';
-            propsList.buttonChangeContent = 'List approve';
-            propsList.buttonContent = 'Return';
-            propsList.buttonColor = 'success';
-            propsList.supportButtonContent = 'Return';
-        }
-        return propsList;
-    }, [showListBorrowed])
 
     async function getStudents() {
         let data = await fetchData('GET', `api/histories?limit=${limitItem}&page=${currentPage}`)
@@ -50,10 +33,37 @@ const IndexApprove = (props) => {
         }
     }
 
-    async function handleApprove(historyId) {
+    async function handleApprove(history) {
         setIsDisabled(true);
+        let dataHistorySend;
+        if (Array.isArray(history)) {
+            dataHistorySend = history.map((item) => {
+                return {
+                    id: item.id,
+                    bookId: item.Book.id,
+                    timeStart: item.timeStart,
+                    newBorrowed: item.timeStart ? +item.Book.borrowed - +item.Book.quantityBorrowed : item.Book.borrowed
+                    // quantityBorrowed: item.Book.quantityBorrowed,
+                    // borrowedBefore: item.Book.borrowed
+                }
+            })
+        } else {
 
-        let data = await fetchData('POST', 'api/histories/uptime', { id: historyId });
+
+            dataHistorySend = {
+                id: history.id,
+                bookId: history.Book.id,
+                timeStart: history.timeStart,
+                newBorrowed: history.timeStart ? (history.quantityBorrowedUpdate > 0 ? history.quantityGive : (+history.Book.borrowed - +history.Book.quantityBorrowed)) : history.Book.borrowed,
+
+                // Data xử lí khi ko trả Book với quantity max
+                studentId: history.Student.id,
+                quantityGive: history.quantityGive,
+                quantityBorrowedUpdate: history.quantityBorrowedUpdate,
+            }
+        }
+
+        let data = await fetchData('POST', 'api/histories/uptime', dataHistorySend);
         if (data.EC === 0) {
             getStudents();
             toast.success(data.EM);
@@ -64,18 +74,22 @@ const IndexApprove = (props) => {
     }
 
     async function deleteHistories() {
-        let historyIdsDelete = [];
+        let listHistoriesDelete = [];
 
-        listStudentsRef?.current?.forEach((item) => {
+        stateGlobal.dataListHistories.forEach((item) => {
             let minuteItem = (getSecondsCurrent() - convertTimeStringToSecond(item.Book.timeBorrowed.time)) / 60;
-            if (minuteItem > minutesClearBook) {
-                historyIdsDelete.push(item.id);
+            if (minuteItem > minutesClearBook && !item.timeStart) {
+                listHistoriesDelete.push({
+                    id: item.id,
+                    bookId: item.Book.id,
+                    quantityBorrowed: item.Book.quantityBorrowed
+                });
             }
         })
 
 
 
-        let data = await fetchData('DELETE', 'api/histories', { id: historyIdsDelete })
+        let data = await fetchData('DELETE', 'api/histories', { listHistories: listHistoriesDelete })
 
         return data;
     }
@@ -99,37 +113,40 @@ const IndexApprove = (props) => {
         getStudents();
     }, [currentPage])
 
+    // useEffect(() => {
+    //     handleClearBook();
+    // }, [])
+
     useEffect(() => {
-        handleClearBook();
+        dispatch({ type: ACTION.SET_DATA_APPROVE, payload: { handleApprove, fetchListHistories: getStudents } })
     }, [])
+
 
 
     return (
         <>
             <div className='float-start'>
-                <h3>{listApproveBorrowed.header} students</h3>
-                <form className="d-flex my-2 gap-2 mt-3" onSubmit={(e) => handleClearBook(e)}>
+                <h3>List approve students</h3>
+                <form className="d-flex my-2 gap-2 mt-3 mb-4" onSubmit={(e) => handleClearBook(e)}>
                     <input onChange={(e) => setMinutesClearBook(e.target.value)} value={minutesClearBook} type="number" className="form-control w-25" />
                     <button type="submit" className="btn btn-success">Set</button>
-                    <p className="opacity-75 fst-italic m-0 mt-1 w-100">(Auto clear book after not approve <strong className="text-danger">{minutesClearBook} minutes</strong>)</p>
+                    <p className="opacity-75 fst-italic m-0 mt-1 w-100">(Auto clear book not approve after <strong className="text-danger">{minutesClearBook} minutes</strong>)</p>
                 </form>
             </div>
 
+            <div className="d-flex float-end">
+                {listStudentsRef?.current?.length > 0 &&
+                    <SearchBar
+                        listRefDefault={listStudentsRef.current}
+                        listSearch={listStudents}
+                        setListSearch={setListStudents}
+                        pathDeepObj={'Student.fullName'}
+                        classNameCss={'w-75 me-3'}
+                        placeholder={'Searching ...'}
+                    />
+                }
 
-            {listStudentsRef?.current?.length > 0 &&
-                <SearchBar
-                    listRefDefault={listStudentsRef.current}
-                    listSearch={listStudents}
-                    setListSearch={setListStudents}
-                    pathDeepObj={'Student.fullName'}
-                    classNameCss={'w-25 float-end'}
-                    placeholder={'Searching ...'}
-                />
-            }
-
-            <div className="d-flex flex-row-reverse w-100 gap-3">
                 <button onClick={() => getStudents()} className="btn btn-warning">Refresh</button>
-                <button onClick={() => toggleShowListBorrowed()} className={`btn btn-primary`}>{listApproveBorrowed.buttonChangeContent}</button>
             </div>
 
             <Table className='listApprove my-3' bordered hover>
@@ -138,14 +155,15 @@ const IndexApprove = (props) => {
                         <th>
                             Full Name
                         </th>
+                        <th>Quantity Reality</th>
                         <th>Quantity Borrowed</th>
                         <th>Book Borrowed</th>
                         <th>Is Borrowed</th>
                         <th>Actions
                             <button className="btn btn-danger btn-sm float-end" data-toggle="tooltip" data-placement="bottom" title="Approve all 'Đươc mượn về'"
-                                onClick={() => handleApprove()}
+                                onClick={() => handleApprove(stateGlobal.dataListHistories)}
                                 disabled={isDisabled}
-                            >{listApproveBorrowed.supportButtonContent} all</button>
+                            >Approve all</button>
                         </th>
                     </tr>
                 </thead>
@@ -157,15 +175,16 @@ const IndexApprove = (props) => {
                                 item[showListBorrowed ? 'timeEnd' : 'timeStart'] === null &&
                                 <tr key={`history-${index}`} className={`${showListBorrowed && item.timeStart === null ? 'd-none' : ''}`}>
                                     <td>{item.Student.fullName}</td>
+                                    <td>{item.Book.quantityReality}</td>
                                     <td>{item.Book.quantityBorrowed}</td>
                                     <td>{item.Book.name}</td>
                                     <td className={`${item.Book.categories.some(item => item.isBorrowed === 0) ? `fw-bold text-danger` : ''}`}>{item.Book.categories.some(item => item.isBorrowed === 0) ? `Chỉ đọc tại chỗ` : 'Được mượn về'}</td>
 
                                     <td>
-                                        <button className={`btn btn-${listApproveBorrowed.buttonColor}`}
-                                            onClick={() => handleApprove(item.id)}
+                                        <button className={`btn btn-info`}
+                                            onClick={() => handleApprove(item)}
                                             disabled={isDisabled}
-                                        >{listApproveBorrowed.buttonContent}</button>
+                                        >Approve</button>
                                     </td>
                                 </tr>
                             )

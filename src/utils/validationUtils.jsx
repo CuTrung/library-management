@@ -45,6 +45,7 @@ const validate = (formId, field) => {
                                 }
 
                                 if (!isChecked) {
+                                    isValid = false;
                                     messageInvalid(item.name);
                                     addClassInvalid(form, item.name);
                                 } else {

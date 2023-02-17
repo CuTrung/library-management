@@ -13,7 +13,7 @@ import { ACTION, GlobalContext } from '../../../context/globalContext';
 
 const ListBooks = (props, ref) => {
     const [listBooks, setListBooks] = useState([]);
-    const [limitItem, setLimitItem] = useState(5);
+    const [limitItem, setLimitItem] = useState(4);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(null);
     const listBooksRef = useRef(null);
@@ -40,19 +40,25 @@ const ListBooks = (props, ref) => {
         getBooks();
     }, [currentPage])
 
+
+
     return (
         <>
             <h3 className='float-start my-3'>List books</h3>
-            {listBooksRef?.current?.length > 0 &&
-                <SearchBar
-                    listRefDefault={listBooksRef.current}
-                    listSearch={listBooks}
-                    setListSearch={setListBooks}
-                    pathDeepObj={'name'}
-                    classNameCss={'float-end my-3'}
-                    placeholder={'Searching ...'}
-                />
-            }
+            <div className='d-flex float-end'>
+                {listBooksRef?.current?.length > 0 &&
+                    <SearchBar
+                        listRefDefault={listBooksRef.current}
+                        listSearch={listBooks}
+                        setListSearch={setListBooks}
+                        pathDeepObj={'name'}
+                        classNameCss={'w-75 me-3'}
+                        placeholder={'Searching ...'}
+                    />
+                }
+
+                <button onClick={() => getBooks()} className="btn btn-warning">Refresh</button>
+            </div>
 
             {listBooks.length > 0 ?
                 <>
@@ -68,7 +74,9 @@ const ListBooks = (props, ref) => {
                                 </th>
                                 <th>Price</th>
                                 <th>Quantity</th>
+                                <th>Quantity Reality</th>
                                 <th>Categories</th>
+                                <th>Majors</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -80,6 +88,7 @@ const ListBooks = (props, ref) => {
                                         <td>{book.name}</td>
                                         <td>{book.price}</td>
                                         <td>{book.quantity}</td>
+                                        <td>{book.quantityReality}</td>
                                         <td>
                                             {book.Categories.length > 0 &&
                                                 book.Categories.map((category, index) => {
@@ -89,6 +98,21 @@ const ListBooks = (props, ref) => {
                                                                 <><strong>{index + 1}. </strong>{category.name}</>
                                                                 :
                                                                 `${category.name ?? ''}`
+                                                            }
+                                                        </p>
+                                                    )
+                                                })
+                                            }
+                                        </td>
+                                        <td>
+                                            {book.Majors.length > 0 &&
+                                                book.Majors.map((major, index) => {
+                                                    return (
+                                                        <p key={`major-${index + 1}`} className='mb-0 mb-2'>
+                                                            {book.Majors.length > 1 ?
+                                                                <><strong>{index + 1}. </strong>{major.description}</>
+                                                                :
+                                                                `${major.description ?? ''}`
                                                             }
                                                         </p>
                                                     )

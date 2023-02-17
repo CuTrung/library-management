@@ -29,7 +29,7 @@ const CardBook = ({ book, rounded = false, disabled }) => {
 
                 <img
                     className={`w-100 ${rounded ? 'rounded' : ''}`}
-                    src={book?.image ?? `../../../../src/assets/img/default.jpg`}
+                    src={book?.image ?? stateGlobal.defaultImgUrl}
                     alt=""
                 />
             </button>
@@ -37,7 +37,7 @@ const CardBook = ({ book, rounded = false, disabled }) => {
             <div className="w-75 h-25 bg-dark bg-opacity-75 text-white position-absolute bottom-0 start-50 translate-middle-x">
                 <p className="m-0 text-center">{book?.name}</p>
                 <p className="float-start">Mã sách: {book?.id}</p>
-                <p className="float-end">Có {+book?.quantity - +book?.borrowed} cuốn</p>
+                <p className="float-end">Có {+book?.quantityReality - +book?.borrowed} cuốn</p>
             </div>
         </div>
     );

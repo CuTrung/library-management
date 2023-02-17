@@ -19,12 +19,13 @@ import HomeLibrary from './components/user/library/homeLibrary';
 import Page404 from './components/both/page404';
 import IndexGroupRoles from './components/admin/groupRoles/indexGroupRoles';
 import Register from './components/both/register';
+import IndexDepartments from './components/admin/departments/indexDepartments';
 
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   //<React.StrictMode>
-  <BrowserRouter>
+  <BrowserRouter basename={import.meta.env.VITE_BASENAME}>
     <Routes>
       <Route path="/" element={<App />} >
         <Route path="/register" element={<Register />} />
@@ -39,6 +40,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/admin" element={<Admin />}>
           <Route path="books" element={<IndexBooks />} />
           <Route path="categories" element={<IndexCategories />} />
+          <Route path="departments" element={<IndexDepartments />} />
           <Route path="groupRoles" element={<IndexGroupRoles />} />
         </Route>
       </Route>

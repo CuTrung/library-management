@@ -6,7 +6,7 @@ import _ from "lodash";
 import SearchBar from '../../both/searchBar';
 import { CiEdit } from 'react-icons/ci';
 import { MdDeleteForever } from 'react-icons/md';
-// import '../../../assets/scss/admin/groupRoles/listGroupRoles.scss';
+import '../../../assets/scss/admin/groupRoles/listGroupRoles.scss';
 import LoadingIcon from '../../both/loadingIcon';
 
 

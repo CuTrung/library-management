@@ -31,7 +31,7 @@ const CarouselLibrary = ({ listBooks }) => {
                                             <CardBook
                                                 key={`cardBook-${index}`}
                                                 book={book}
-                                                disabled={book.quantity - book.borrowed === 0}
+                                                disabled={+book.quantityReality - +book.borrowed === 0}
                                             />
                                         );
                                     })}

@@ -31,10 +31,10 @@ const BookDetails = (props) => {
         <>
             <div className='row'>
                 <div className="col-3">
-                    <img className='w-100 pt-3' src={stateGlobal.dataBookBorrowed.image ?? "../../../../src/assets/img/default.jpg"} alt="" />
+                    <img className='w-100 pt-3' src={stateGlobal.dataBookBorrowed?.image ?? stateGlobal.defaultImgUrl} alt="" />
                 </div>
                 <div className="col-9">
-                    <h4>{stateGlobal.dataBookBorrowed.name}</h4>
+                    <h4>{stateGlobal.dataBookBorrowed?.name}</h4>
                     <p>[Cập nhật lúc: time]</p>
                     <div className="row">
                         <div className="col-6">
@@ -45,9 +45,9 @@ const BookDetails = (props) => {
                         </div>
                         <div className="col-6">
                             <p>Đang cập nhật</p>
-                            <p>{stateGlobal.dataBookBorrowed.Status?.name}</p>
+                            <p>{stateGlobal.dataBookBorrowed?.Status?.name}</p>
                             <p>
-                                {stateGlobal.dataBookBorrowed.Categories?.length > 0 && stateGlobal.dataBookBorrowed.Categories?.map((category, index) => {
+                                {stateGlobal.dataBookBorrowed?.Categories?.length > 0 && stateGlobal.dataBookBorrowed?.Categories?.map((category, index) => {
                                     return (
                                         <Link to='/' key={`categoryDetails-${index}`} className='text-decoration-none'
                                             onClick={() => handleCategory(category)}

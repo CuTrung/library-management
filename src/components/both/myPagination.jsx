@@ -1,5 +1,3 @@
-import React, { Component, useRef, useState } from "react";
-import { useEffect } from "react";
 import ReactPaginate from 'react-paginate';
 
 
