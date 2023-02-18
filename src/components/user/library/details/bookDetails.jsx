@@ -19,11 +19,12 @@ const BookDetails = (props) => {
 
     const handleCategory = (category) => {
         dispatch({
-            type: ACTION.SET_CATEGORY_IDS_CONTENT_LIBRARY,
-            payload: {
-                categoryIds: category.id,
-                categoryNames: category.name
-            }
+            type: ACTION.SET_DATA_FILTER_CONTENT_LIBRARY,
+            payload: [{
+                type: 'CATEGORY',
+                categoryIds: [category.id],
+                name: category.name,
+            }]
         })
     }
 

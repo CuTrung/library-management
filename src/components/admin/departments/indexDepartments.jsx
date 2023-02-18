@@ -99,7 +99,6 @@ const IndexDepartments = (props) => {
         let data = await fetchData('GET', `api/${typeName.toLowerCase()}s`)
         if (data.EC === 0) {
             setListTypesTable(data.DT);
-            toast.success(data.EM);
         } else {
             toast.error(data.EM);
         }

@@ -47,16 +47,20 @@ const ListGroupRoles = (props, ref) => {
         <>
             <h3 className='float-start my-3'>List groupRoles</h3>
 
-            {listGroupRolesRef.current?.length > 0 &&
-                <SearchBar
-                    listRefDefault={listGroupRolesRef.current}
-                    listSearch={listGroupRoles}
-                    setListSearch={setListGroupRoles}
-                    pathDeepObj={'name'}
-                    classNameCss={'float-end my-3'}
-                    placeholder={'Searching ...'}
-                />
-            }
+            <div className='d-flex gap-2 my-3 float-end'>
+                {listGroupRolesRef.current?.length > 0 &&
+                    <SearchBar
+                        listRefDefault={listGroupRolesRef.current}
+                        listSearch={listGroupRoles}
+                        setListSearch={setListGroupRoles}
+                        pathDeepObj={'name'}
+                        classNameCss={'w-75'}
+                        placeholder={'Searching ...'}
+                    />
+                }
+                <button className='btn btn-warning'
+                    onClick={() => getGroupRoles()}>Refresh</button>
+            </div>
 
             {listGroupRoles.length > 0 ?
                 <>

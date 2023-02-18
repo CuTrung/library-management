@@ -41,16 +41,21 @@ const ListCategories = (props, ref) => {
         <>
             <h3 className='my-3 float-start'>List categories</h3>
 
-            {listCategoriesRef?.current?.length > 0 &&
-                <SearchBar
-                    listRefDefault={listCategoriesRef.current}
-                    listSearch={listCategories}
-                    setListSearch={setListCategories}
-                    pathDeepObj={'name'}
-                    classNameCss={'my-3 float-end w-50 me-3'}
-                    placeholder={'Searching ...'}
-                />
-            }
+            <div className='d-flex float-end my-3 gap-2'>
+                {listCategoriesRef?.current?.length > 0 &&
+                    <SearchBar
+                        listRefDefault={listCategoriesRef.current}
+                        listSearch={listCategories}
+                        setListSearch={setListCategories}
+                        pathDeepObj={'name'}
+                        classNameCss={'w-75'}
+                        placeholder={'Searching ...'}
+                    />
+                }
+
+                <button className='btn btn-warning'
+                    onClick={() => getCategories()}>Refresh</button>
+            </div>
 
 
 

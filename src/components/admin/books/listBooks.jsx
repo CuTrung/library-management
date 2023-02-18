@@ -25,7 +25,7 @@ const ListBooks = (props, ref) => {
             listBooksRef.current = data.DT.books;
             setListBooks(data.DT.books);
             setTotalPages(data.DT.totalPages);
-            dispatch({ type: ACTION.SET_SAMPLE_BOOKS, payload: data.DT.books })
+            dispatch({ type: ACTION.SET_SAMPLE_BOOKS, payload: data.DT.books });
         }
     }
 
@@ -76,7 +76,7 @@ const ListBooks = (props, ref) => {
                                 <th>Quantity</th>
                                 <th>Quantity Reality</th>
                                 <th>Categories</th>
-                                <th>Majors</th>
+                                {/* <th>Majors</th> */}
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -104,7 +104,7 @@ const ListBooks = (props, ref) => {
                                                 })
                                             }
                                         </td>
-                                        <td>
+                                        {/* <td>
                                             {book.Majors.length > 0 &&
                                                 book.Majors.map((major, index) => {
                                                     return (
@@ -118,7 +118,7 @@ const ListBooks = (props, ref) => {
                                                     )
                                                 })
                                             }
-                                        </td>
+                                        </td> */}
                                         <td>{book.Status.name}</td>
                                         <td className='d-flex gap-1'>
                                             <button onClick={() => props.setBookUpdate(book)} className='btn btn-warning'>Edit</button>

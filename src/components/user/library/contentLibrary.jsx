@@ -26,7 +26,6 @@ const ContentLibrary = (props) => {
     }
 
     async function handleFilter(isClearFilter) {
-
         let checkboxesFilter = $$('[type="checkbox"]');
         const filterItems = [];
 
@@ -68,7 +67,6 @@ const ContentLibrary = (props) => {
                 listFilters.push({ ...item, type: item.type });
             }
         });
-
 
         dispatch({
             type: ACTION.SET_DATA_FILTER_CONTENT_LIBRARY,
@@ -161,9 +159,7 @@ const ContentLibrary = (props) => {
                 <div className="col-md-10 col-sm-12 border border-3">
                     <div className="row">
                         <div className="w-100 my-3">
-                            {/* <h4 className="text-info float-start w-50 text-wrap">{stateGlobal.dataCategory?.categoryNames ? `Sách theo thể loại > ${stateGlobal.dataCategory.categoryNames}` : 'Sách mới cập nhật >'}</h4> */}
-
-                            <h4 className="text-info float-start w-50 text-wrap">{stateGlobal.dataFilter?.length === 1 || stateGlobal.dataFilter?.length === 2 ? `Kết quả tìm kiếm >` : `Sách mới cập nhật >`}</h4>
+                            <h4 className="text-info float-start w-50 text-wrap">{stateGlobal.dataFilter?.length === 1 || stateGlobal.dataFilter?.length === 2 ? `Kết quả lọc >` : `Sách mới cập nhật >`}</h4>
 
                             {listBooksRef.length > 0 &&
                                 <SearchBar

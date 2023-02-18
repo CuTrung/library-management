@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CarouselLibrary from "./carouselLibrary";
 import ContentLibrary from "./contentLibrary";
-import { fetchData } from "../../../utils/myUtils";
+import { $, $$, fetchData } from "../../../utils/myUtils";
 import { useContext } from "react";
 import { ACTION, GlobalContext } from "../../../context/globalContext";
 import { useRef } from "react";
@@ -22,11 +22,11 @@ const HomeLibrary = (props) => {
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
 
-
     async function getBooks(listFilters) {
         let data;
         if (!_.isEmpty(listFilters)) {
             data = await fetchData('GET', `api/books/filter?limit=${limitItem}&page=${currentPage}`, { listFilters });
+
         } else {
             data = await fetchData("GET", `api/books?limit=${limitItem}&page=${currentPage}`);
         }
@@ -39,8 +39,9 @@ const HomeLibrary = (props) => {
             setListBooks(data.DT.books);
             setTotalPages(data.DT.totalPages);
             dispatch({ type: ACTION.GET_BOOKS_HOME_LIBRARY, payload: getBooks })
-
         }
+
+
     }
 
     async function handleSelect(type, value) {
