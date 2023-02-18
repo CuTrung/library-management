@@ -1,7 +1,7 @@
 node_modules
 src/seeders
 .env
-
+build
 
 ### VisualStudioCode ###
 .vscode/*
