@@ -73,52 +73,50 @@ const getAllBooks = async () => {
 const filterAllBooksBy = async (dataQuery) => {
     try {
         const { listFilters } = dataQuery;
-        let data;
+        // Filter only category or major when listFilters.length === 1
+        const opCondition = listFilters.length === 1 ? 'and' : 'or';
+        let dataCondition = {
+            [`${listFilters[0].type.toLowerCase()}Id`]: listFilters[0][`${listFilters[0].type.toLowerCase()}Ids`]
+        };
 
-        // Filter Category or Major
-        if (listFilters.length === 1) {
-            data = await db.Book_Category_Major.findAndCountAll({
-                where: {
-                    [`${listFilters[0].type.toLowerCase()}Id`]: listFilters[0][`${listFilters[0].type.toLowerCase()}Ids`]
-                },
-                attributes: [],
-                include: [
-                    {
-                        model: db.Book,
-                        attributes: ['id', 'name', 'price', 'borrowed', 'quantity', 'quantityReality', 'image']
-                    }
-                ],
-                order: [['id', 'DESC']],
-                raw: true,
-                nest: true
-            })
-        } else {
+        if (!opCondition) {
             let major_categoryIds = [];
-            for (const majorId of listFilters[0].majorIds) {
-                for (const categoryId of listFilters[1].categoryIds) {
+            for (const majorId of listFilters[0]?.majorIds) {
+                for (const categoryId of listFilters[1]?.categoryIds) {
                     major_categoryIds.push({
                         majorId,
                         categoryId
                     })
                 }
             }
-
-            data = await db.Book_Category_Major.findAndCountAll({
-                where: {
-                    [Op.or]: major_categoryIds
-                },
-                attributes: [],
-                include: [
-                    {
-                        model: db.Book,
-                        attributes: ['id', 'name', 'price', 'borrowed', 'quantity', 'quantityReality', 'image']
-                    }
-                ],
-                order: [['id', 'DESC']],
-                raw: true,
-                nest: true
-            })
+            dataCondition = major_categoryIds;
         }
+
+        let data = await db.Book_Category_Major.findAndCountAll({
+            where: {
+                [Op[opCondition]]: dataCondition
+            },
+            attributes: [],
+            include: [
+                {
+                    model: db.Book,
+                    attributes: ['id', 'name', 'price', 'borrowed', 'quantity', 'quantityReality', 'image'],
+                    include: [
+                        {
+                            model: db.Status,
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                },
+                {
+                    model: db.Category,
+                    attributes: ['id', 'name', 'isBorrowed'],
+                },
+            ],
+            order: [['id', 'DESC']],
+            raw: true,
+            nest: true
+        })
 
         // Merge object wanted
         data = data.map((item) => ({ ...item.Book }))
