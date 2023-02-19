@@ -109,9 +109,9 @@ const IndexApprove = (props) => {
         getStudents();
     }, [currentPage])
 
-    // useEffect(() => {
-    //     handleClearBook();
-    // }, [])
+    useEffect(() => {
+        handleClearBook();
+    }, [])
 
     useEffect(() => {
         dispatch({ type: ACTION.SET_DATA_APPROVE, payload: { handleApprove, fetchListHistories: getStudents } })
