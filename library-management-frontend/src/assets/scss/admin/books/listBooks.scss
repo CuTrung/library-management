@@ -1,0 +1,11 @@
+.arrowUp,
+.arrowDow,
+.threeDotsIcon {
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.listBooks {
+    min-height: 60vh;
+}

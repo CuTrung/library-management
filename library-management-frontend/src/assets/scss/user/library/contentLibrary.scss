@@ -1,0 +1,17 @@
+.listContentLibrary {
+    min-height: 108vh;
+
+    .itemBook {
+        @media screen and (min-width: 0px) and (max-width: 576px) {
+            // Phone
+            height: 22vh;
+        }
+
+        @media screen and (min-width: 768px) {
+            // Laptop
+            height: 33vh;
+        }
+
+
+    }
+}
