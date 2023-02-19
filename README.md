@@ -109,6 +109,7 @@ Phần mềm sử dụng các công nghệ phía Front-end cũng như Back-end �
   - Trải nghiệm phần mềm tại URL ở front-end 
 
   - Cách 2: Chạy dự án với Docker
+    * Sử dụng docker-compose
       1. Đảm bảo chắc chắn rằng bạn đã cài Docker (url docker)
       2. Sau khi đã clone dự án về, thực hiện chuyển sang branch "run-with-docker"
         ```sh
