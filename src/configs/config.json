@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
+    "username": "myuser",
+    "password": "mypass",
     "database": "library-management",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "mysql",
     "timezone": "+07:00"
   },
@@ -15,10 +15,11 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "myuser",
+    "password": "mypass",
+    "database": "library-management",
+    "host": "db",
+    "dialect": "mysql",
+    "timezone": "+07:00"
   }
 }

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon --exec babel-node src/server.js",
     "build": "babel src -d build --copy-files && node build/server.js",
-    "resetDB": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all"
+    "resetDB": "npx sequelize-cli db:migrate:undo:all && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
+    "execSequelize": "npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all"
   },
   "repository": {
     "type": "git",
