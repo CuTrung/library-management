@@ -48,8 +48,6 @@ const IndexApprove = (props) => {
                 }
             })
         } else {
-
-
             dataHistorySend = {
                 id: history.id,
                 bookId: history.Book.id,
@@ -86,8 +84,6 @@ const IndexApprove = (props) => {
                 });
             }
         })
-
-
 
         let data = await fetchData('DELETE', 'api/histories', { listHistories: listHistoriesDelete })
 
