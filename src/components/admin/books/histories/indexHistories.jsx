@@ -99,7 +99,6 @@ const IndexHistories = (props) => {
         }
 
         if (type === 'GIVE') {
-            // Update lại quantityBorrowed (Đang lỗi ở đây)
             stateGlobal.dataApprove?.handleApprove({
                 ...history,
                 quantityGive: valueInput,
@@ -107,9 +106,8 @@ const IndexHistories = (props) => {
             });
         }
 
-
         // Xem xét các hàm handleClearForm có dùng reset đc ko, nếu đc thì thay thế toàn bộ
-        // e.target.reset();
+        e.target.reset();
     }
 
 
