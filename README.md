@@ -28,7 +28,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Library Management][product-screenshot]]
+![product-screenshot]
 
 - Phần mềm "Library Management" là một dự án cá nhân dùng để tham dự cuộc thi "Thiết kế thư viện" cấp trường. Phần mềm hỗ trợ sinh viên đăng kí mượn, trả sách online, tìm kiếm sách ở thư viện trường ITC. Đồng thời cũng hỗ trợ thủ thư trong việc thêm mới, chỉnh sửa, quản lí, thống kê sách, theo dõi lịch sử trả, mượn sách.
 
