@@ -117,7 +117,7 @@ Phần mềm sử dụng các công nghệ phía Front-end cũng như Back-end �
         ```sh
         git checkout run-with-docker
         ```
-      3. Trong 2 folder "library-management-*", chuyển đổi file ".env.example" => ".env", sau đó khai báo các value cần thiết trong cả 2 file ".env" để có thể chạy
+      3. Chuyển đổi file ".env.example" => ".env", sau đó khai báo các value cần thiết để chạy file docker-compose. Làm tương tự với 2 ***folders"library-management-*"***  
         ![env-example-docker]
       4. Chạy phần mềm với docker bằng câu lệnh
         ```sh
