@@ -82,7 +82,7 @@ Phần mềm sử dụng các công nghệ phía Front-end cũng như Back-end �
         ```
 
       3. Chuyển đổi file ".env.example" => ".env", sau đó khai báo các value cần thiết trong file ".env" để có thể chạy và kết nối đến Database (Ở đây sử dụng Mysql) 
-        [![Env Example Backend]([env-example-backend])]
+        [![env-example-backend]]
 
       4. Trong Mysql, tạo database bạn đã khai báo trong file .env (DB_NAME=?)
         
@@ -104,7 +104,7 @@ Phần mềm sử dụng các công nghệ phía Front-end cũng như Back-end �
         npm install
         ```
       3. Chuyển đổi file ".env.example" => ".env", sau đó khai báo các value cần thiết trong file ".env" để có thể chạy
-        [![Env Example Frontend]([env-example-frontend])]
+        [![env-example-frontend]]
       4. Chạy front-end với câu lệnh 
         ```sh
         npm start
@@ -118,7 +118,7 @@ Phần mềm sử dụng các công nghệ phía Front-end cũng như Back-end �
         git checkout run-with-docker
         ```
       3. Trong 2 folder "library-management-*", chuyển đổi file ".env.example" => ".env", sau đó khai báo các value cần thiết trong cả 2 file ".env" để có thể chạy
-        [![Env Example Docker](env-example-docker)]
+        [![env-example-docker]]
       4. Chạy phần mềm với docker bằng câu lệnh
         ```sh
         docker compose --env-file .env -p library-management up -d
