@@ -164,8 +164,8 @@ Project Link: [https://github.com/CuTrung/library-management](https://github.com
 [Node-url]: https://nodejs.org/
 [Sequelize.js]: https://img.shields.io/badge/Sequelize-20232A?style=for-the-badge&logo=sequelize&color=5f6368
 [Sequelize-url]: https://sequelize.org/
-[Docker.js]: https://img.shields.io/badge/Docker-20232A?style=for-the-badge&logo=docker&color=788991
-[Docker.com]: https://docker.com
+[Docker.com]: https://img.shields.io/badge/Docker-20232A?style=for-the-badge&logo=docker&color=788991
+[Docker-url]: https://docker.com
 [Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
 [Bootstrap-url]: https://getbootstrap.com
 
