@@ -10,7 +10,7 @@ services:
       context: .
       dockerfile: ./nginx/Dockerfile
     ports:
-      - ${FRONTEND_PORT}:${NGINX_PORT}
+      - ${FRONTEND_PORT}:80
     volumes:
       # - ./nginx/config/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/config/default.conf:/etc/nginx/conf.d/default.conf
@@ -44,9 +44,8 @@ services:
     environment:
       - DB_HOST=${DB_HOST}
     ports:
-      - "${BACKEND_PORT}:${BACKEND_DOCKER_PORT}"
+      - "${BACKEND_PORT}:8080"
 volumes:
   data:
-  
 
     # Run app with command: docker compose --env-file .env -p library-management up -d
