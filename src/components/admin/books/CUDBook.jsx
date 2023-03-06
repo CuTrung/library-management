@@ -53,7 +53,15 @@ const CUDBook = (props) => {
             propsForm.supportButtonColor = 'danger';
         }
         return propsForm;
-    }, [bookUpdate])
+    }, [bookUpdate]);
+
+    function handleClearCheckboxInvalid() {
+        for (const item of $$("[type='checkbox']")) {
+            if (item.classList.contains('is-invalid')) {
+                item.classList.remove('is-invalid');
+            }
+        }
+    }
 
     async function getStatus() {
         try {
@@ -325,6 +333,7 @@ const CUDBook = (props) => {
                             {listCategories.length > 0 && listCategories.map((category, index) => {
                                 return (
                                     <Form.Check
+                                        onChange={() => handleClearCheckboxInvalid()}
                                         disabled={fileName ?? false}
                                         name='category'
                                         key={`category-${index}`}
@@ -344,6 +353,7 @@ const CUDBook = (props) => {
                             {listMajors.length > 0 && listMajors.map((major, index) => {
                                 return (
                                     <Form.Check
+                                        onChange={() => handleClearCheckboxInvalid()}
                                         disabled={fileName ?? false}
                                         name='major'
                                         key={`major-${index}`}
