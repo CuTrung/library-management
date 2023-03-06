@@ -48,7 +48,7 @@ const ContentLibrary = (props) => {
                 type: ACTION.SET_DATA_FILTER_CONTENT_LIBRARY,
                 payload: []
             })
-            return stateGlobal.fnGetBooksHomeLibrary?.();
+            return stateGlobal.dataBooksHomeLibrary?.fnGetBooksHomeLibrary?.();
         }
 
         let listFilters = [];
@@ -73,7 +73,7 @@ const ContentLibrary = (props) => {
             payload: listFilters
         })
 
-        stateGlobal.fnGetBooksHomeLibrary?.(listFilters);
+        stateGlobal.dataBooksHomeLibrary?.fnGetBooksHomeLibrary?.(listFilters);
     }
 
     async function getListDepartments() {

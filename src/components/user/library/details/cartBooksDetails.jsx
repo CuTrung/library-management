@@ -14,6 +14,7 @@ import _ from 'lodash';
 import { toast } from "react-toastify";
 import { AiFillMinusCircle, AiFillPlusCircle } from 'react-icons/ai';
 import { BsBookmarkDashFill } from "react-icons/bs";
+import CardBook from "../cardBook";
 
 
 const CardBooksDetails = (props) => {
@@ -149,8 +150,8 @@ const CardBooksDetails = (props) => {
                                                 <div className="col-3 text-center ">
                                                     <img src={book?.image ?? stateGlobal.defaultImgUrl} className="rounded-circle w-50" alt="" />
                                                 </div>
-                                                <div className="col-9 border-start border-3 border-info ">
 
+                                                <div className="col-9 border-start border-3 border-info ">
                                                     <Form.Check
                                                         className="checkBorrowed position-absolute top-0 end-0 d-flex"
                                                         type={'checkbox'}

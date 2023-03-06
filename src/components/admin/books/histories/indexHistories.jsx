@@ -41,18 +41,21 @@ const IndexHistories = (props) => {
         if (listHistories.length === 0)
             return toast.error("List histories is empty! Can't export !");
 
-        let listHistoriesExport = listHistories.map((item) => {
-            return {
-                fullName: item.Student.fullName,
-                name: item.Book.name,
-                quantityBorrowed: item.Book.quantityBorrowed,
-                quantityBookLost: item.quantityBookLost,
-                price: item.Book.price,
-                timeStart: item.timeStart,
-                timeEnd: item.timeEnd,
-            }
-        });
 
+        let listHistoriesExport = listHistories
+            .filter(item => item.timeStart)
+            .map((item) => {
+                if (item.timeStart)
+                    return {
+                        fullName: item.Student.fullName,
+                        name: item.Book.name,
+                        quantityBorrowed: item.Book.quantityBorrowed,
+                        quantityBookLost: item.quantityBookLost,
+                        price: item.Book.price,
+                        timeStart: item.timeStart,
+                        timeEnd: item.timeEnd,
+                    }
+            });
 
         const isSuccess = exportExcel({
             listData: listHistoriesExport,
@@ -105,6 +108,7 @@ const IndexHistories = (props) => {
                 quantityBorrowedUpdate: +history.Book.quantityBorrowed - valueInput,
             });
         }
+
 
         // Xem xét các hàm handleClearForm có dùng reset đc ko, nếu đc thì thay thế toàn bộ
         e.target.reset();

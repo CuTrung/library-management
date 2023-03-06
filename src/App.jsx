@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './App.css';
 import { Outlet, useLocation } from "react-router-dom";
 import Header from './components/user/header';
 import GlobalContextProvider, { GlobalContext } from './context/globalContext';

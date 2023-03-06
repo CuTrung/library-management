@@ -43,8 +43,6 @@ const IndexApprove = (props) => {
                     bookId: item.Book.id,
                     timeStart: item.timeStart,
                     newBorrowed: item.timeStart ? +item.Book.borrowed - +item.Book.quantityBorrowed : item.Book.borrowed
-                    // quantityBorrowed: item.Book.quantityBorrowed,
-                    // borrowedBefore: item.Book.borrowed
                 }
             })
         } else {
@@ -85,6 +83,8 @@ const IndexApprove = (props) => {
             }
         })
 
+
+
         let data = await fetchData('DELETE', 'api/histories', { listHistories: listHistoriesDelete })
 
         return data;
@@ -109,9 +109,9 @@ const IndexApprove = (props) => {
         getStudents();
     }, [currentPage])
 
-    useEffect(() => {
-        handleClearBook();
-    }, [])
+    // useEffect(() => {
+    //     handleClearBook();
+    // }, [])
 
     useEffect(() => {
         dispatch({ type: ACTION.SET_DATA_APPROVE, payload: { handleApprove, fetchListHistories: getStudents } })

@@ -26,9 +26,9 @@ const HomeLibrary = (props) => {
         let data;
         if (!_.isEmpty(listFilters)) {
             data = await fetchData('GET', `api/books/filter?limit=${limitItem}&page=${currentPage}`, { listFilters });
-
         } else {
             data = await fetchData("GET", `api/books?limit=${limitItem}&page=${currentPage}`);
+
         }
 
         if (data.EC === 0) {
@@ -38,7 +38,13 @@ const HomeLibrary = (props) => {
             }
             setListBooks(data.DT.books);
             setTotalPages(data.DT.totalPages);
-            dispatch({ type: ACTION.GET_BOOKS_HOME_LIBRARY, payload: getBooks })
+            dispatch({
+                type: ACTION.SET_DATA_BOOKS_HOME_LIBRARY,
+                payload: {
+                    fnGetBooksHomeLibrary: getBooks,
+                    listBooksHomeLibrary: listBooksCarouselRef.current
+                }
+            })
         }
 
 
