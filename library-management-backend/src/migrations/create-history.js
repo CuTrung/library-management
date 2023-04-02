@@ -10,13 +10,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       studentId: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       bookId: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       quantityBorrowed: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       timeStart: {
         type: Sequelize.STRING
@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       quantityBookLost: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

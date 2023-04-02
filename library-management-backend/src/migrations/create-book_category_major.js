@@ -10,13 +10,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       bookId: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       categoryId: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       majorId: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

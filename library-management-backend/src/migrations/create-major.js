@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       departmentId: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

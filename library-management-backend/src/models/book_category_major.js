@@ -11,14 +11,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Book_Category_Major.belongsTo(models.Book);
-      Book_Category_Major.belongsTo(models.Category);
+      Book_Category_Major.belongsTo(models.Book, { foreignKey: 'bookId' });
+      Book_Category_Major.belongsTo(models.Category, { foreignKey: 'categoryId' });
     }
   }
   Book_Category_Major.init({
-    bookId: DataTypes.STRING,
-    categoryId: DataTypes.STRING,
-    majorId: DataTypes.STRING,
+    bookId: DataTypes.INTEGER,
+    categoryId: DataTypes.INTEGER,
+    majorId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Book_Category_Major',

@@ -9,10 +9,12 @@ const ACTION = {
     ADD_FN_PUSH_TO_CART: 'ADD_FN_PUSH_TO_CART',
     SET_DATA_BOOK_BORROWED: 'SET_DATA_BOOK_BORROWED',
     SET_DATA_LIST_HISTORIES: 'SET_DATA_LIST_HISTORIES',
-    GET_BOOKS_HOME_LIBRARY: 'GET_BOOKS_HOME_LIBRARY',
+    SET_DATA_BOOKS_HOME_LIBRARY: 'SET_DATA_BOOKS_HOME_LIBRARY',
     SET_CATEGORY_IDS_CONTENT_LIBRARY: 'SET_CATEGORY_IDS_CONTENT_LIBRARY',
     SET_SAMPLE_BOOKS: 'SET_SAMPLE_BOOKS',
-    SET_DATA_APPROVE: 'SET_DATA_APPROVE'
+    SET_DATA_APPROVE: 'SET_DATA_APPROVE',
+    SET_DATA_TOP_LIST_BOOKS: 'SET_DATA_TOP_LIST_BOOKS',
+    SET_DATA_FILTER_CONTENT_LIBRARY: 'SET_DATA_FILTER_CONTENT_LIBRARY'
 }
 
 
@@ -26,14 +28,16 @@ function reducer(state, action) {
             return { ...state, dataBookBorrowed: action.payload };
         case ACTION.SET_DATA_LIST_HISTORIES:
             return { ...state, dataListHistories: action.payload };
-        case ACTION.GET_BOOKS_HOME_LIBRARY:
-            return { ...state, fnGetBooksHomeLibrary: action.payload };
+        case ACTION.SET_DATA_BOOKS_HOME_LIBRARY:
+            return { ...state, dataBooksHomeLibrary: action.payload };
         case ACTION.SET_DATA_FILTER_CONTENT_LIBRARY:
             return { ...state, dataFilter: action.payload };
         case ACTION.SET_SAMPLE_BOOKS:
             return { ...state, listBooksSample: action.payload };
         case ACTION.SET_DATA_APPROVE:
             return { ...state, dataApprove: action.payload };
+        case ACTION.SET_DATA_TOP_LIST_BOOKS:
+            return { ...state, dataTopList: action.payload };
         default:
             throw new Error();
     }

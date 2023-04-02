@@ -26,8 +26,6 @@ const getBooks = async (req, res) => {
         console.log(error);
         return apiUtils.resStatusJson(res, 500, apiUtils.resFormat());
     }
-
-
 }
 
 const upsertBook = async (req, res) => {

@@ -11,17 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      History.belongsTo(models.Student);
-      History.belongsTo(models.Book);
+      History.belongsTo(models.Student, { foreignKey: 'studentId' });
+      History.belongsTo(models.Book, { foreignKey: 'bookId' });
     }
   }
   History.init({
-    studentId: DataTypes.STRING,
-    bookId: DataTypes.STRING,
-    quantityBorrowed: DataTypes.STRING,
+    studentId: DataTypes.INTEGER,
+    bookId: DataTypes.INTEGER,
+    quantityBorrowed: DataTypes.INTEGER,
     timeStart: DataTypes.STRING,
     timeEnd: DataTypes.STRING,
-    quantityBookLost: DataTypes.STRING,
+    quantityBookLost: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'History',

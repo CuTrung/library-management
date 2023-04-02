@@ -6,6 +6,7 @@ import { useContext } from "react";
 import { ACTION, GlobalContext } from "../../../context/globalContext";
 import { useRef } from "react";
 import _ from "lodash";
+import { useSessionStorage } from "../../../hooks/useStorage";
 
 
 const HomeLibrary = (props) => {
@@ -17,7 +18,7 @@ const HomeLibrary = (props) => {
     const listBooksRef = useRef([]);
     const listBooksCarouselRef = useRef([]);
     const [listMajorsByDepartment, setListMajorsByDepartment] = useState([]);
-
+    const [topList, setTopList] = useSessionStorage('topList');
 
 
     const { stateGlobal, dispatch } = useContext(GlobalContext);
@@ -26,19 +27,26 @@ const HomeLibrary = (props) => {
         let data;
         if (!_.isEmpty(listFilters)) {
             data = await fetchData('GET', `api/books/filter?limit=${limitItem}&page=${currentPage}`, { listFilters });
-
         } else {
             data = await fetchData("GET", `api/books?limit=${limitItem}&page=${currentPage}`);
+
         }
 
         if (data.EC === 0) {
             listBooksRef.current = data.DT.books;
             if (_.isEmpty(listFilters)) {
                 listBooksCarouselRef.current = data.DT.books;
+                setTopList(listBooksCarouselRef.current);
             }
             setListBooks(data.DT.books);
             setTotalPages(data.DT.totalPages);
-            dispatch({ type: ACTION.GET_BOOKS_HOME_LIBRARY, payload: getBooks })
+            dispatch({
+                type: ACTION.SET_DATA_BOOKS_HOME_LIBRARY,
+                payload: {
+                    fnGetBooksHomeLibrary: getBooks,
+                    listBooksHomeLibrary: topList,
+                }
+            })
         }
 
 
@@ -55,10 +63,11 @@ const HomeLibrary = (props) => {
     }
 
 
-
     useEffect(() => {
         getBooks(stateGlobal.dataFilter);
     }, [currentPage]);
+
+
 
     return (
         <>

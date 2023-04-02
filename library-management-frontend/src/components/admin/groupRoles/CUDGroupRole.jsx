@@ -57,11 +57,18 @@ const CUDGroupRole = (props) => {
     }
 
 
+    function handleClearCheckboxInvalid() {
+        for (const item of $$("[type='checkbox']")) {
+            if (item.classList.contains('is-invalid')) {
+                item.classList.remove('is-invalid');
+            }
+        }
+    }
+
     function handleClearForm() {
         document.getElementById('upsertGroupOrRoleForm').reset();
+        document.getElementById('upsertGroupRoleForm').reset();
         setGroupRoleUpdate({});
-
-        document.getElementById('upsertGroupRolesForm').reset();
     }
 
     async function handleDelete(type, id, groupRoleId) {
@@ -97,13 +104,13 @@ const CUDGroupRole = (props) => {
 
 
     async function upsertGroupRole(type, e) {
-        setIsDisabled(true);
         e?.preventDefault();
 
         // validate
-        let isValid = validationUtils.validate('upsertGroupOrRoleForm');
+        let isValid = type === 'GROUP' ? validationUtils.validate('upsertGroupRoleForm') : validationUtils.validate('upsertGroupOrRoleForm');
         if (!isValid) return;
 
+        setIsDisabled(true);
         let data;
         if (type === 'ROLE') {
             data = await fetchData('POST', 'api/groupRoles', {
@@ -188,11 +195,11 @@ const CUDGroupRole = (props) => {
 
                     <hr />
 
-                    <form id='upsertGroupRolesForm' onSubmit={(e) => upsertGroupRole('GROUP', e)}>
+                    <form id='upsertGroupRoleForm' onSubmit={(e) => upsertGroupRole('GROUP', e)}>
 
                         <h3 className='my-3'>Set role for group</h3>
 
-                        <Form.Select ref={group} onChange={(e) => handleSelectGroup(e.target.value)} className='mb-3' aria-label="Default select example">
+                        <Form.Select name='group' ref={group} onChange={(e) => handleSelectGroup(e.target.value)} className='mb-3' aria-label="Default select example">
                             <option hidden value=''>Choose Group</option>
                             {groupRoles.length > 0 && groupRoles.map((item, index) => {
                                 return (
@@ -206,6 +213,7 @@ const CUDGroupRole = (props) => {
                                 return (
                                     <span key={`role-${index} `} className='d-flex'>
                                         <Form.Check
+                                            onChange={() => handleClearCheckboxInvalid()}
                                             className='role'
                                             name='role'
                                             data-id={role.id}
@@ -221,7 +229,9 @@ const CUDGroupRole = (props) => {
                             })}
                         </span>
 
-                        <Button className={`btn-primary me-3 mt-3`} type='submit'>Submit</Button>
+                        <Button
+                            disabled={isDisabled}
+                            className={`btn-primary me-3 mt-3`} type='submit'>Submit</Button>
 
                         <Button onClick={handleClearForm} className={`btn-warning mt-3`} type='button'>Clear</Button>
 

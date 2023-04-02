@@ -72,7 +72,9 @@ const IndexApprove = (props) => {
     async function deleteHistories() {
         let listHistoriesDelete = [];
 
-        stateGlobal.dataListHistories.forEach((item) => {
+        if (!stateGlobal.dataListHistories) return;
+
+        stateGlobal.dataListHistories?.forEach((item) => {
             let minuteItem = (getSecondsCurrent() - convertTimeStringToSecond(item.Book.timeBorrowed.time)) / 60;
             if (minuteItem > minutesClearBook && !item.timeStart) {
                 listHistoriesDelete.push({
@@ -83,35 +85,37 @@ const IndexApprove = (props) => {
             }
         })
 
-
-
         let data = await fetchData('DELETE', 'api/histories', { listHistories: listHistoriesDelete })
+
+        if (data.EC === 0 && data.DT !== 0) {
+            await getStudents();
+        }
 
         return data;
     }
 
 
     async function handleClearBook(e) {
+        let refreshInterval;
         e?.preventDefault();
-        return new Promise((resolve, reject) => {
-            setInterval(async () => {
-                resolve(
-                    await deleteHistories()
-                )
-            }, minutesClearBook * 60000)
-        }).then(async (res) => {
-            if (res.DT > 0)
-                await getStudents();
-        })
+        refreshInterval = setInterval(async () => {
+            let data = await deleteHistories();
+            if (data && data.DT === 0) {
+                clearInterval(refreshInterval);
+            }
+        }, true ? 5000 : minutesClearBook * 60000)
+
     }
+
+    // useEffect(() => {
+    //     handleClearBook();
+    // }, [stateGlobal.dataListHistories])
+
 
     useEffect(() => {
         getStudents();
     }, [currentPage])
 
-    // useEffect(() => {
-    //     handleClearBook();
-    // }, [])
 
     useEffect(() => {
         dispatch({ type: ACTION.SET_DATA_APPROVE, payload: { handleApprove, fetchListHistories: getStudents } })

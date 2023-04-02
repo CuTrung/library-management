@@ -1,7 +1,7 @@
 import Table from 'react-bootstrap/Table';
 import { useEffect, useState, forwardRef, useRef, useImperativeHandle } from 'react';
 import MyPagination from "../../both/myPagination";
-import { fetchData, removeDiacritics } from '../../../utils/myUtils';
+import { exportExcel, fetchData, removeDiacritics } from '../../../utils/myUtils';
 import _ from "lodash";
 import '../../../assets/scss/admin/books/listBooks.scss';
 import Sorting from '../../both/sorting';
@@ -9,11 +9,13 @@ import SearchBar from '../../both/searchBar';
 import LoadingIcon from '../../both/loadingIcon';
 import { useContext } from 'react';
 import { ACTION, GlobalContext } from '../../../context/globalContext';
+import { FcDownload } from "react-icons/fc";
+import { toast } from 'react-toastify';
 
 
 const ListBooks = (props, ref) => {
     const [listBooks, setListBooks] = useState([]);
-    const [limitItem, setLimitItem] = useState(4);
+    const [limitItem, setLimitItem] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(null);
     const listBooksRef = useRef(null);
@@ -41,11 +43,45 @@ const ListBooks = (props, ref) => {
     }, [currentPage])
 
 
+    // Export file excel
+    function handleExport() {
+        if (listBooks.length === 0)
+            return toast.error("List histories is empty! Can't export !");
+
+
+        let listBooksExport = listBooks
+            .map((item) => {
+                return {
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    quantityReality: item.quantityReality,
+                    Categories: item.Categories.map(category => category.name).join(', '),
+                    Status: item.Status.name,
+                }
+            });
+
+        const isSuccess = exportExcel({
+            listData: listBooksExport,
+            listHeadings: [
+                'Tên sách', 'Giá', 'Số lượng ban đầu', 'Số lượng thực tế', 'Thể loại', 'Tình trạng'
+            ],
+            nameFile: 'List Books'
+        });
+        if (isSuccess)
+            return toast.success("Export excel successful!")
+
+        toast.error("Export excel failed!")
+    }
+
 
     return (
         <>
             <h3 className='float-start my-3'>List books</h3>
-            <div className='d-flex float-end'>
+
+
+
+            <div className='d-flex float-end mt-2'>
                 {listBooksRef?.current?.length > 0 &&
                     <SearchBar
                         listRefDefault={listBooksRef.current}
@@ -59,6 +95,11 @@ const ListBooks = (props, ref) => {
 
                 <button onClick={() => getBooks()} className="btn btn-warning">Refresh</button>
             </div>
+
+            <button className="btn btn-outline-success float-end ms-3 py-1 mt-2 me-3"
+                onClick={() => handleExport()}
+            >Export excel <FcDownload size={30} /></button>
+
 
             {listBooks.length > 0 ?
                 <>

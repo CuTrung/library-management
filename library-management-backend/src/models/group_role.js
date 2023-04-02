@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Group_Role.init({
-    groupId: DataTypes.STRING,
-    roleId: DataTypes.STRING,
+    groupId: DataTypes.INTEGER,
+    roleId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Group_Role',

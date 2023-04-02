@@ -22,12 +22,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Book.init({
     name: DataTypes.STRING,
-    price: DataTypes.STRING,
-    borrowed: DataTypes.STRING,
-    quantity: DataTypes.STRING,
-    quantityReality: DataTypes.STRING,
+    price: DataTypes.INTEGER,
+    borrowed: DataTypes.INTEGER,
+    quantity: DataTypes.INTEGER,
+    quantityReality: DataTypes.INTEGER,
     image: DataTypes.TEXT,
-    statusId: DataTypes.STRING,
+    statusId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Book',

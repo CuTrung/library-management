@@ -37,14 +37,21 @@ const getAllBooks = async () => {
             nest: true
         })
 
+
+
         // Merge key which object similar
         let data = [];
         dataBooks.forEach(book => {
-            book = { ...book, Categories: [book.Categories] }
+            book = {
+                ...book,
+                Categories: [book.Categories],
+                Majors: [book.Majors]
+            }
 
             let match = data.find(r => r.id === book.id);
             if (match) {
                 match.Categories = match.Categories.concat(book.Categories);
+                match.Majors = match.Majors.concat(book.Majors);
             } else {
                 data.push(book);
             }

@@ -48,7 +48,7 @@ const ContentLibrary = (props) => {
                 type: ACTION.SET_DATA_FILTER_CONTENT_LIBRARY,
                 payload: []
             })
-            return stateGlobal.fnGetBooksHomeLibrary?.();
+            return stateGlobal.dataBooksHomeLibrary?.fnGetBooksHomeLibrary?.();
         }
 
         let listFilters = [];
@@ -73,7 +73,7 @@ const ContentLibrary = (props) => {
             payload: listFilters
         })
 
-        stateGlobal.fnGetBooksHomeLibrary?.(listFilters);
+        stateGlobal.dataBooksHomeLibrary?.fnGetBooksHomeLibrary?.(listFilters);
     }
 
     async function getListDepartments() {
@@ -89,6 +89,7 @@ const ContentLibrary = (props) => {
         getListDepartments();
         getCategories();
     }, [])
+
 
 
 
@@ -140,6 +141,8 @@ const ContentLibrary = (props) => {
                         {listCategories.length > 0 && listCategories.map((category, index) => {
                             return (
                                 <Form.Check
+                                    // defaultChecked
+                                    defaultChecked={stateGlobal.dataFilter?.length > 0 && stateGlobal.dataFilter[0]?.name === category.name}
                                     data-type={'CATEGORY'}
                                     data-id={category.id}
                                     data-name={category.name}

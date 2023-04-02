@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     classRoom: DataTypes.STRING,
     isDeleted: DataTypes.INTEGER,
-    groupId: DataTypes.STRING,
+    groupId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Student',

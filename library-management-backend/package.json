@@ -33,8 +33,9 @@
     "jsonwebtoken": "8.5.1",
     "lodash": "4.17.21",
     "mysql2": "2.3.3",
-    "nodemailer": "^6.9.1",
+    "nodemailer": "6.9.1",
     "nodemon": "2.0.20",
+    "pg": "8.9.0",
     "sequelize": "6.25.3",
     "sequelize-cli": "6.5.1",
     "uuid": "9.0.0"
