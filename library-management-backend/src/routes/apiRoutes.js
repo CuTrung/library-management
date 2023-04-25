@@ -10,63 +10,63 @@ import departmentController from "../controllers/departmentController";
 
 
 const handleUserRoutes = (router) => {
-    router.post("/api/register", handleUserController.register);
-    router.post("/api/login", handleUserController.login);
-    router.post("/api/logout", handleUserController.logout);
-    router.post("/api/forget", handleUserController.forget);
+    router.post("/register", handleUserController.register);
+    router.post("/login", handleUserController.login);
+    router.post("/logout", handleUserController.logout);
+    router.post("/forget", handleUserController.forget);
 }
 
 const bookRoutes = (router) => {
-    router.get("/api/books", bookController.getBooks);
-    router.get("/api/books/filter", bookController.filterBooksBy);
-    router.post("/api/books", bookController.upsertBook);
-    router.delete("/api/books", bookController.deleteABook);
-    router.post("/api/books/lost", bookController.updateABook);
+    router.get("/books", bookController.getBooks);
+    router.post("/books", bookController.upsertBook);
+    router.patch("/books", bookController.upsertBook);
+    router.delete("/books", bookController.deleteABook);
 }
 
 const statusRoutes = (router) => {
-    router.get("/api/status", statusController.getStatus);
-    // router.post("/api/status", statusController.createANewStatus);
-    // router.delete("/api/status", statusController.deleteAStatus);
-    // router.patch("/api/status", statusController.updateAStatus);
+    router.get("/status", statusController.getStatus);
+    router.post("/status", statusController.upsertStatus);
+    router.delete("/status", statusController.deleteAStatus);
+    router.patch("/status", statusController.updateAStatus);
 }
 
 const categoryRoutes = (router) => {
-    router.get("/api/categories", categoryController.getCategories);
-    router.post("/api/categories", categoryController.upsertCategory);
-    router.delete("/api/categories", categoryController.deleteACategory);
+    router.get("/categories", categoryController.getCategories);
+    router.post("/categories", categoryController.upsertCategory);
+    router.delete("/categories", categoryController.deleteACategory);
 }
 
 const studentRoutes = (router) => {
-    // router.get("/api/students", studentController.getStudents);
-    // router.post("/api/students", studentController.upsertStudent);
-    // router.delete("/api/students", studentController.deleteAStudent);
+    // router.get("/students", studentController.getStudents);
+    // router.post("/students", studentController.upsertStudent);
+    // router.delete("/students", studentController.deleteAStudent);
 }
 
 const historyRoutes = (router) => {
-    router.get("/api/histories", historyController.getHistories);
-    router.post("/api/histories", historyController.upsertHistory);
-    router.post("/api/histories/uptime", historyController.updateTimeApprove);
-    router.delete("/api/histories", historyController.deleteMultiplesHistory);
+    router.get("/histories", historyController.getHistories);
+    router.post("/histories", historyController.upsertHistory);
+    router.patch("/histories", historyController.updateAHistory);
+    router.post("/histories/uptime", historyController.updateTimeApprove);
+    router.delete("/histories", historyController.deleteMultiplesHistory);
 }
 
 const groupRoleRoutes = (router) => {
-    router.get("/api/groupRoles", groupRoleController.getGroupRoles);
-    router.get("/api/groupRoles/roles", groupRoleController.getRoles);
-    router.post("/api/groupRoles", groupRoleController.upsertGroupRole);
-    router.delete("/api/groupRoles", groupRoleController.deleteAGroupRole);
+    router.get("/groupRoles", groupRoleController.getGroupRoles);
+    router.get("/groupRoles/roles", groupRoleController.getRoles);
+    router.post("/groupRoles", groupRoleController.upsertGroupRole);
+    router.delete("/groupRoles", groupRoleController.deleteAGroupRole);
 }
 
 const departmentRoutes = (router) => {
-    router.get("/api/departments", departmentController.getDepartments);
-    router.post("/api/departments", departmentController.createManyDepartments);
-    router.delete("/api/departments", departmentController.deleteADepartment);
+    router.get("/departments", departmentController.getDepartments);
+    router.post("/departments", departmentController.createManyDepartments);
+    router.delete("/departments", departmentController.deleteADepartment);
 }
 
 const majorRoutes = (router) => {
-    router.get("/api/majors", majorController.getMajors);
-    router.post("/api/majors", majorController.createManyMajors);
-    router.delete("/api/majors", majorController.deleteAMajor);
+    router.get("/majors", majorController.getMajors);
+    router.post("/majors", majorController.createManyMajors);
+    router.delete("/majors", majorController.deleteAMajor);
 }
 
 

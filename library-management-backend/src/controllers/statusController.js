@@ -24,13 +24,13 @@ const getStatus = async (req, res) => {
     }
 }
 
-const createANewBook = async (req, res) => {
+const createANewStatus = async (req, res) => {
     try {
-        let isExistEmail = await statusServices.getBookByEmail(req.body.email);
+        let isExistEmail = await statusServices.getStatusByEmail(req.body.email);
         if (isExistEmail.DT) {
             return apiUtils.resStatusJson(res, 200, apiUtils.resFormat(1, "Email is exist, can't create"));
         }
-        let data = await statusServices.createANewBook(req.body);
+        let data = await statusServices.createANewStatus(req.body);
         if (data.EC === 0 || data.EC === 1)
             return apiUtils.resStatusJson(res, 200, data);
 
@@ -41,9 +41,9 @@ const createANewBook = async (req, res) => {
     }
 }
 
-const deleteABook = async (req, res) => {
+const deleteAStatus = async (req, res) => {
     try {
-        let data = await statusServices.deleteABook(req.body);
+        let data = await statusServices.deleteAStatus(req.body);
         if (data.EC === 0 || data.EC === 1)
             return apiUtils.resStatusJson(res, 200, data);
 
@@ -54,14 +54,27 @@ const deleteABook = async (req, res) => {
     }
 }
 
-const updateABook = async (req, res) => {
+const upsertStatus = async (req, res) => {
     try {
-        let isExistEmail = await statusServices.getBookByEmail(req.body.email);
-        if (isExistEmail.DT) {
-            return resStatusJson(res, 200, apiUtils.resFormat(1, "Email is exist, can't update"))
+        let data = await statusServices.upsertStatus(req.body);
+        if (data.EC === 0 || data.EC === 1)
+            return apiUtils.resStatusJson(res, 200, data);
+
+        return apiUtils.resStatusJson(res, 500, data);
+    } catch (error) {
+        console.log(error);
+        return apiUtils.resStatusJson(res, 500, apiUtils.resFormat());
+    }
+}
+
+const updateAStatus = async (req, res) => {
+    try {
+        let isExistStatus = await statusServices.getStatusBy({ name: req.body.name });
+        if (isExistStatus.DT) {
+            return resStatusJson(res, 200, apiUtils.resFormat(1, "Status is exist, can't update"))
         }
 
-        let data = await statusServices.updateABook(req.body);
+        let data = await statusServices.updateAStatus(req.body);
         if (data.EC === 0 || data.EC === 1)
             return apiUtils.resStatusJson(res, 200, data);
 
@@ -74,5 +87,5 @@ const updateABook = async (req, res) => {
 
 
 export default {
-    getStatus, createANewBook, deleteABook, updateABook
+    getStatus, createANewStatus, deleteAStatus, updateAStatus, upsertStatus
 }

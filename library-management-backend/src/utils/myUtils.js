@@ -19,6 +19,18 @@ const dateFormat = (dateObj) => {
     }
 }
 
+function getFormattedDate(date) {
+    var year = date.getFullYear();
+
+    var month = (1 + date.getMonth()).toString();
+    month = month.length > 1 ? month : '0' + month;
+
+    var day = date.getDate().toString();
+    day = day.length > 1 ? day : '0' + day;
+
+    return day + '/' + month + '/' + year;
+}
+
 const getCurrentDate = () => {
     return new Date().toLocaleDateString('en-GB', {
         year: 'numeric',
@@ -70,10 +82,14 @@ const sendEmail = (toEmail, title, content, html) => {
     });
 }
 
-
+function addDays(date, days) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return getFormattedDate(result);
+}
 
 
 export {
     logData, dateFormat, getCurrentDate, conditionForSequelize, sendEmail,
-    upperCaseFirstChar
+    upperCaseFirstChar, addDays, getFormattedDate
 }

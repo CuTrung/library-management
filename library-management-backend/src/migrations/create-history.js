@@ -27,6 +27,9 @@ module.exports = {
       quantityBookLost: {
         type: Sequelize.INTEGER
       },
+      isReturned: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

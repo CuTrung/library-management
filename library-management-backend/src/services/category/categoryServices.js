@@ -3,7 +3,7 @@ import apiUtils from '../../utils/apiUtils';
 import passwordUtils from "../../utils/passwordUtils";
 import { Op } from "sequelize";
 import dotenv from 'dotenv';
-import { logData } from "../../utils/myUtils";
+import { logData, upperCaseFirstChar } from "../../utils/myUtils";
 dotenv.config();
 
 const getAllCategories = async () => {
@@ -83,20 +83,52 @@ const getCategoriesWithPagination = async (page, limit, time) => {
     }
 }
 
-const upsertCategory = async (category) => {
+const upsertCategory = async (dataCategory) => {
     try {
-        if (!category.id)
+        // Insert with excel
+        if (Array.isArray(dataCategory)) {
+            let messageError = '';
+            let categoryIds = [];
+            for await (const item of dataCategory) {
+                if (!([0, 1, '0', '1'].includes(item['Được mượn (= 1 nếu cho phép)']))) {
+                    messageError = `'Được mượn' - row ${item.rowNum + 1}`;
+                    break;
+                }
+
+                let categoryCreated = await db.Category.create({
+                    name: upperCaseFirstChar(item['Tên']),
+                    isBorrowed: item['Được mượn (= 1 nếu cho phép)']
+                })
+
+                let categoryCreatedId = categoryCreated.get({ plain: true }).id
+                categoryIds.push(categoryCreatedId);
+            }
+
+            if (messageError) {
+                await db.Category.destroy({
+                    where: {
+                        id: categoryIds
+                    }
+                })
+
+                return apiUtils.resFormat(1, `Create multiples category failed ! Something wrongs at col ${messageError}`);
+            }
+
+            return apiUtils.resFormat(0, `Create multiples category successful !`);
+        }
+
+        if (!dataCategory.id)
             await db.Category.create({
-                ...category
+                ...dataCategory
             })
         else
             await db.Category.update({
-                ...category,
+                ...dataCategory,
             }, {
-                where: { id: category.id }
+                where: { id: dataCategory.id }
             })
 
-        return apiUtils.resFormat(0, `${category.id ? 'Update a' : 'Create a new'} category successful !`);
+        return apiUtils.resFormat(0, `${dataCategory.id ? 'Update a' : 'Create a new'} category successful !`);
     } catch (error) {
         console.log(error);
         return apiUtils.resFormat();

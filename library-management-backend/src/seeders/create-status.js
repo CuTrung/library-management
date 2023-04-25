@@ -6,16 +6,31 @@ module.exports = {
     // npx sequelize-cli db:seed:all
     return queryInterface.bulkInsert('Status', [{
       name: 'OLD',
+      belongsToTable: 'BOOK',
       createdAt: new Date(),
       updatedAt: new Date()
     },
     {
       name: 'NEW',
+      belongsToTable: 'BOOK',
       createdAt: new Date(),
       updatedAt: new Date()
     },
     {
       name: 'BROKEN',
+      belongsToTable: 'BOOK',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      name: 'ĐÃ TRẢ',
+      belongsToTable: 'HISTORY',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      name: 'CHƯA TRẢ',
+      belongsToTable: 'HISTORY',
       createdAt: new Date(),
       updatedAt: new Date()
     },

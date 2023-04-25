@@ -17,7 +17,7 @@ const initRoutes = (app) => {
     apiRoutes.departmentRoutes(router);
     apiRoutes.majorRoutes(router);
 
-    return app.use("/", router);
+    return app.use("/api/v1", router);
 }
 
 export default initRoutes;

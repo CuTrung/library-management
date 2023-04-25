@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     timeStart: DataTypes.STRING,
     timeEnd: DataTypes.STRING,
     quantityBookLost: DataTypes.INTEGER,
+    isReturned: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'History',

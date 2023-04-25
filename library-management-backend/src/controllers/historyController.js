@@ -6,13 +6,13 @@ const getHistories = async (req, res) => {
         if (req.query && req.query.page) {
             let page = +req.query.page;
             let limit = +req.query.limit;
-            let data = await historyServices.getHistoriesWithPagination(page, limit, +req.query?.delay);
+            let data = await historyServices.getHistoriesWithPagination(page, limit, +req.query?.delay, req.query);
             if (data.EC === 0 || data.EC === 1)
                 return apiUtils.resStatusJson(res, 200, data);
 
             return apiUtils.resStatusJson(res, 500, data);
         } else {
-            let data = await historyServices.getAllHistories();
+            let data = await historyServices.getAllHistories(req);
             if (data.EC === 0 || data.EC === 1)
                 return apiUtils.resStatusJson(res, 200, data);
 
@@ -65,8 +65,20 @@ const updateTimeApprove = async (req, res) => {
     }
 }
 
+const updateAHistory = async (req, res) => {
+    try {
+        let data = await historyServices.updateAHistory(req.body);
+        if (data.EC === 0 || data.EC === 1)
+            return apiUtils.resStatusJson(res, 200, data);
+
+        return apiUtils.resStatusJson(res, 500, data);
+    } catch (error) {
+        console.log(error);
+        return apiUtils.resStatusJson(res, 500, apiUtils.resFormat());
+    }
+}
 
 export default {
     getHistories, upsertHistory, deleteMultiplesHistory,
-    updateTimeApprove
+    updateTimeApprove, updateAHistory
 }

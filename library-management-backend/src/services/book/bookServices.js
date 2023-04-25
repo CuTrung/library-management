@@ -10,11 +10,17 @@ import { upperCaseFirstChar } from "../../utils/myUtils";
 import majorServices from "../major/majorServices";
 dotenv.config();
 
-const getAllBooks = async () => {
+const getAllBooks = async (params) => {
     try {
+        const { listFilters } = params
+        if (listFilters && listFilters.length > 0) {
+            let result = await filterAllBooksBy(listFilters, page, limit, time);
+            return result;
+        }
+
         let dataBooks = await db.Book.findAll({
             attributes: [
-                'id', 'name', 'price',
+                'id', 'name', 'description', 'price', 'author',
                 'borrowed', 'quantity', 'quantityReality', 'image'
             ],
             include: [
@@ -77,55 +83,142 @@ const getAllBooks = async () => {
     }
 }
 
-const filterAllBooksBy = async (dataQuery) => {
+const getBooksWithPagination = async (page, limit, time, params) => {
     try {
-        const { listFilters } = dataQuery;
-        let data;
+        const { listFilters } = params
+        if (listFilters && listFilters.length > 0) {
+            let result = await filterBooksByWithPagination(listFilters, page, limit, time);
+            console.log(">>> result", result.DT.books);
 
-        // Filter Category or Major
-        if (listFilters.length === 1) {
-            data = await db.Book_Category_Major.findAndCountAll({
-                where: {
-                    [`${listFilters[0].type.toLowerCase()}Id`]: listFilters[0][`${listFilters[0].type.toLowerCase()}Ids`]
+            return result;
+        }
+
+        let offset = (page - 1) * limit;
+        let { count, rows } = await db.Book.findAndCountAll({
+            attributes: [
+                'id', 'name', 'description', 'price', 'author',
+                'borrowed', 'quantity', 'quantityReality', 'image'
+            ],
+            include: [
+                {
+                    model: db.Status,
+                    attributes: ['id', 'name'],
                 },
-                attributes: [],
-                include: [
-                    {
-                        model: db.Book,
-                        attributes: ['id', 'name', 'price', 'borrowed', 'quantity', 'quantityReality', 'image']
-                    }
-                ],
-                order: [['id', 'DESC']],
-                raw: true,
-                nest: true
-            })
-        } else {
-            let major_categoryIds = [];
-            for (const majorId of listFilters[0].majorIds) {
-                for (const categoryId of listFilters[1].categoryIds) {
-                    major_categoryIds.push({
-                        majorId,
-                        categoryId
-                    })
-                }
+                {
+                    model: db.Category,
+                    attributes: ['id', 'name', 'isBorrowed'],
+                    through: { attributes: [] },
+                },
+                {
+                    model: db.Major,
+                    attributes: ['id', 'name', 'description'],
+                    through: { attributes: [] }
+                },
+            ],
+            order: [['id', 'DESC']],
+            limit: limit,
+            offset: offset,
+            raw: true,
+            nest: true
+        })
+
+        let result = [];
+        rows.forEach(book => {
+            book = {
+                ...book,
+                Categories: [book.Categories],
+                Majors: [book.Majors]
             }
 
-            data = await db.Book_Category_Major.findAndCountAll({
-                where: {
-                    [Op.or]: major_categoryIds
-                },
-                attributes: [],
-                include: [
-                    {
-                        model: db.Book,
-                        attributes: ['id', 'name', 'price', 'borrowed', 'quantity', 'quantityReality', 'image']
-                    }
-                ],
-                order: [['id', 'DESC']],
-                raw: true,
-                nest: true
-            })
+            let match = result.find(r => r.id === book.id);
+            if (match) {
+                match.Categories = match.Categories.concat(book.Categories);
+                match.Majors = match.Majors.concat(book.Majors);
+            } else {
+                result.push(book);
+            }
+        });
+
+        result = result.map((item) => {
+            const uniqueCategories = [...new Map(item.Categories.map(itemUnique => [itemUnique.name, itemUnique])).values()];
+
+            const uniqueMajors = [...new Map(item.Majors.map(itemUnique => [itemUnique.name, itemUnique])).values()];
+
+            return {
+                ...item,
+                Categories: uniqueCategories,
+                Majors: uniqueMajors
+            }
+        })
+
+        rows = result;
+
+        // Vì merge nhiều reference nên cần lấy lại chính xác count;
+        count = await db.Book.count();
+
+        let totalPages = Math.ceil(count / limit);
+
+        let data = {
+            totalRows: count,
+            totalPages: totalPages,
+            books: rows
         }
+
+        if (time)
+            await apiUtils.delay(time);
+
+        return apiUtils.resFormat(0, "Get books with pagination successful !", data);
+    } catch (error) {
+        console.log(error);
+        return apiUtils.resFormat();
+    }
+}
+
+const filterAllBooksBy = async (listFilters) => {
+    try {
+        const opCondition = listFilters.length === 1 ? 'or' : 'and';
+
+        const keyCategory = Object.keys(listFilters[0])[0];
+
+        let dataCondition = [{
+            [`${keyCategory.replace("s", "")}`]: listFilters[0][keyCategory]
+        }];
+
+        if (opCondition === 'and') {
+            const keyMajor = Object.keys(listFilters[1])[0];
+            dataCondition.push({
+                [`${keyMajor.replace("s", "")}`]: listFilters[1][keyMajor]
+            });
+        }
+
+        let offset = (page - 1) * limit;
+        let { count, rows } = await db.Book_Category_Major.findAndCountAll({
+            where: {
+                [Op[opCondition]]: dataCondition
+            },
+            attributes: [],
+            include: [
+                {
+                    model: db.Book,
+                    attributes: ['id', 'name', 'description', 'price', 'author', 'borrowed', 'quantity', 'quantityReality', 'image'],
+                    include: [
+                        {
+                            model: db.Status,
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                },
+                {
+                    model: db.Category,
+                    attributes: ['id', 'name', 'isBorrowed'],
+                },
+            ],
+            order: [['bookId', 'DESC']],
+            limit: limit,
+            offset: offset,
+            raw: true,
+            nest: true
+        })
 
         // Merge object wanted
         data = data.map((item) => ({ ...item.Book }))
@@ -141,26 +234,21 @@ const filterAllBooksBy = async (dataQuery) => {
     }
 }
 
-const filterBooksByWithPagination = async (dataQuery, page, limit, time) => {
+const filterBooksByWithPagination = async (listFilters, page, limit, time) => {
     try {
-        const { listFilters } = dataQuery;
-        // Filter only category or major when listFilters.length === 1
-        const opCondition = listFilters.length === 1 ? 'and' : 'or';
-        let dataCondition = {
-            [`${listFilters[0].type.toLowerCase()}Id`]: listFilters[0][`${listFilters[0].type.toLowerCase()}Ids`]
-        };
+        const opCondition = listFilters.length === 1 ? 'or' : 'and';
 
-        if (!opCondition) {
-            let major_categoryIds = [];
-            for (const majorId of listFilters[0]?.majorIds) {
-                for (const categoryId of listFilters[1]?.categoryIds) {
-                    major_categoryIds.push({
-                        majorId,
-                        categoryId
-                    })
-                }
-            }
-            dataCondition = major_categoryIds;
+        const keyCategory = Object.keys(listFilters[0])[0];
+
+        let dataCondition = [{
+            [`${keyCategory.replace("s", "")}`]: listFilters[0][keyCategory]
+        }];
+
+        if (opCondition === 'and') {
+            const keyMajor = Object.keys(listFilters[1])[0];
+            dataCondition.push({
+                [`${keyMajor.replace("s", "")}`]: listFilters[1][keyMajor]
+            });
         }
 
         let offset = (page - 1) * limit;
@@ -172,7 +260,7 @@ const filterBooksByWithPagination = async (dataQuery, page, limit, time) => {
             include: [
                 {
                     model: db.Book,
-                    attributes: ['id', 'name', 'price', 'borrowed', 'quantity', 'quantityReality', 'image'],
+                    attributes: ['id', 'name', 'description', 'price', 'author', 'borrowed', 'quantity', 'quantityReality', 'image'],
                     include: [
                         {
                             model: db.Status,
@@ -185,7 +273,7 @@ const filterBooksByWithPagination = async (dataQuery, page, limit, time) => {
                     attributes: ['id', 'name', 'isBorrowed'],
                 },
             ],
-            order: [['id', 'DESC']],
+            order: [['bookId', 'DESC']],
             limit: limit,
             offset: offset,
             raw: true,
@@ -216,92 +304,6 @@ const filterBooksByWithPagination = async (dataQuery, page, limit, time) => {
         rows = [...new Map(rows.map(item => [item.name, item])).values()];
 
         let totalPages = Math.ceil(count / limit);
-        let data = {
-            totalRows: count,
-            totalPages: totalPages,
-            books: rows
-        }
-
-        if (time)
-            await apiUtils.delay(time);
-
-        return apiUtils.resFormat(0, "Get books with pagination successful !", data);
-    } catch (error) {
-        console.log(error);
-        return apiUtils.resFormat();
-    }
-}
-
-const getBooksWithPagination = async (page, limit, time) => {
-    try {
-        let offset = (page - 1) * limit;
-        let { count, rows } = await db.Book.findAndCountAll({
-            attributes: [
-                'id', 'name', 'price',
-                'borrowed', 'quantity', 'quantityReality', 'image'
-            ],
-            include: [
-                {
-                    model: db.Status,
-                    attributes: ['id', 'name'],
-                },
-                {
-                    model: db.Category,
-                    attributes: ['id', 'name', 'isBorrowed'],
-                    through: { attributes: [] },
-                },
-                {
-                    model: db.Major,
-                    attributes: ['id', 'name', 'description'],
-                    through: { attributes: [] }
-                },
-            ],
-            order: [['id', 'DESC']],
-            limit: limit,
-            offset: offset,
-            raw: true,
-            nest: true
-        })
-
-
-        let result = [];
-        rows.forEach(book => {
-            book = {
-                ...book,
-                Categories: [book.Categories],
-                Majors: [book.Majors]
-            }
-
-            let match = result.find(r => r.id === book.id);
-            if (match) {
-                match.Categories = match.Categories.concat(book.Categories);
-                match.Majors = match.Majors.concat(book.Majors);
-            } else {
-                result.push(book);
-            }
-        });
-
-
-
-        result = result.map((item) => {
-            const uniqueCategories = [...new Map(item.Categories.map(itemUnique => [itemUnique.name, itemUnique])).values()];
-
-            const uniqueMajors = [...new Map(item.Majors.map(itemUnique => [itemUnique.name, itemUnique])).values()];
-
-            return {
-                ...item,
-                Categories: uniqueCategories,
-                Majors: uniqueMajors
-            }
-        })
-
-        rows = result;
-
-        // Vì merge nhiều reference nên cần lấy lại chính xác count;
-        count = await db.Book.count();
-
-        let totalPages = Math.ceil(count / limit);
-
         let data = {
             totalRows: count,
             totalPages: totalPages,
@@ -354,6 +356,8 @@ const upsertBook = async (dataBook) => {
 
                 let bookCreated = await db.Book.create({
                     name: item['Tên'],
+                    author: item['Tác giả'],
+                    description: item['Mô tả'],
                     price: item['Giá'],
                     quantity: item['Số lượng'],
                     quantityReality: item['Số lượng'],
@@ -391,13 +395,13 @@ const upsertBook = async (dataBook) => {
             return apiUtils.resFormat(0, `Create multiples book successful !`);
         }
 
-
         let category_majorIds = dataBook.category_majorIds;
         delete dataBook["category_majorIds"];
         let data;
         if (!dataBook.id)
             data = await db.Book.create({
-                ...dataBook
+                ...dataBook,
+                borrowed: 0
             })
         else
             data = await db.Book.update({
@@ -408,9 +412,7 @@ const upsertBook = async (dataBook) => {
 
         let bookId = dataBook.id ? dataBook.id : data.get({ plain: true }).id;
 
-        let listBook_Category_Major = category_majorIds.map((category_majorId) => ({ bookId, ...category_majorId }));
-
-        if (dataBook.id) {
+        if (dataBook.id && category_majorIds) {
             await db.Book_Category_Major.destroy({
                 where: {
                     bookId
@@ -418,9 +420,14 @@ const upsertBook = async (dataBook) => {
             })
         }
 
-        await db.Book_Category_Major.bulkCreate(listBook_Category_Major);
+        if (category_majorIds) {
+            let listBook_Category_Major = category_majorIds.map((category_majorId) => ({ bookId, ...category_majorId }));
 
-        return apiUtils.resFormat(0, `${dataBook.id ? 'Update a' : 'Create a new'} book successful !`);
+            await db.Book_Category_Major.bulkCreate(listBook_Category_Major);
+        }
+
+        const dataBookUpdate = await getBooksBy({ id: bookId });
+        return apiUtils.resFormat(0, `${dataBook.id ? 'Update a' : 'Create a new'} book successful !`, dataBookUpdate.DT);
     } catch (error) {
         console.log(error);
         return apiUtils.resFormat();
@@ -449,15 +456,18 @@ const deleteABook = async (dataId) => {
     }
 }
 
-const updateABook = async (newData, id) => {
+const updateABook = async ({ id, ...dataUpdate }) => {
     try {
         await db.Book.update({
-            ...newData
+            ...dataUpdate
         }, {
-            where: { id }
+            where: { id },
         })
 
-        return apiUtils.resFormat(0, "Update a book successful !");
+        const data = await getBooksBy({ id });
+        if (data.EC === 0)
+            return apiUtils.resFormat(0, "Update a book successful !", data.DT);
+        return apiUtils.resFormat(1, "Update a book failed !");
     } catch (error) {
         console.log(error);
         return apiUtils.resFormat();
@@ -469,7 +479,7 @@ const getBooksBy = async (condition) => {
         let data = await db.Book.findAll({
             where: { ...condition },
             attributes: [
-                'id', 'name', 'price', 'borrowed', 'quantity', 'quantityReality'
+                'id', 'name', 'description', 'price', 'author', 'borrowed', 'quantity', 'quantityReality'
             ],
             raw: true,
             nest: true
@@ -487,6 +497,5 @@ const getBooksBy = async (condition) => {
 
 export default {
     getAllBooks, upsertBook, deleteABook,
-    getBooksWithPagination, filterAllBooksBy, filterBooksByWithPagination, updateABook, getBooksBy
-
+    getBooksWithPagination, filterAllBooksBy, filterBooksByWithPagination, getBooksBy, updateABook
 }

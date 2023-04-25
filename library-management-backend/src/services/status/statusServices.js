@@ -9,8 +9,9 @@ const getAllStatus = async () => {
     try {
         let data = await db.Status.findAll({
             attributes: [
-                'id', 'name'
+                'id', 'name', 'belongsToTable'
             ],
+            order: [['id', 'DESC']],
             raw: true,
             nest: true
         })
@@ -28,10 +29,9 @@ const getStatusWithPagination = async (page, limit, time) => {
         let offset = (page - 1) * limit;
         let { count, rows } = await db.Status.findAndCountAll({
             attributes: [
-                'id', 'name', 'description', 'price',
-                'borrowed', 'quantity',
+                'id', 'name', 'belongsToTable'
             ],
-
+            order: [['id', 'DESC']],
             limit: limit,
             offset: offset,
             raw: true,
@@ -103,6 +103,59 @@ const deleteAStatus = async (status) => {
     }
 }
 
+const upsertStatus = async (dataStatus) => {
+    try {
+        // Insert with excel
+        if (Array.isArray(dataStatus)) {
+            let messageError = '';
+            let statusIds = [];
+            for await (const item of dataStatus) {
+                if (!(['BOOK', 'HISTORY'].includes(item['Thuộc về bảng']?.toUpperCase()))) {
+                    messageError = `'Được mượn' - row ${item.rowNum + 1}`;
+                    break;
+                }
+
+                let statusCreated = await db.Status.create({
+                    name: item['Tên']?.toUpperCase(),
+                    belongsToTable: item['Thuộc về bảng']?.toUpperCase()
+                })
+
+                let statusCreatedId = statusCreated.get({ plain: true }).id
+                statusIds.push(statusCreatedId);
+            }
+
+            if (messageError) {
+                await db.Status.destroy({
+                    where: {
+                        id: statusIds
+                    }
+                })
+
+                return apiUtils.resFormat(1, `Create multiples status failed ! Something wrongs at col ${messageError}`);
+            }
+
+            return apiUtils.resFormat(0, `Create multiples status successful !`);
+        }
+
+        if (!dataStatus.id)
+            await db.Status.create({
+                ...dataStatus
+            })
+        else
+            await db.Status.update({
+                ...dataStatus,
+            }, {
+                where: { id: dataStatus.id }
+            })
+
+        return apiUtils.resFormat(0, `${dataStatus.id ? 'Update a' : 'Create a new'} status successful !`);
+    } catch (error) {
+        console.log(error);
+        return apiUtils.resFormat();
+    }
+
+}
+
 const updateAStatus = async (statusUpdate) => {
     try {
         const hashPassword = passwordUtils.hashPassword(statusUpdate.password);
@@ -144,12 +197,7 @@ const getStatusBy = async (condition) => {
 }
 
 
-
-
-
-
 export default {
     getAllStatus, createANewStatus, deleteAStatus, updateAStatus,
-    getStatusWithPagination, getStatusBy
-
+    getStatusWithPagination, getStatusBy, upsertStatus
 }

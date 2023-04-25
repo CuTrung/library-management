@@ -3,7 +3,11 @@ const allowCORS = (app) => {
     app.use(function (req, res, next) {
 
         // Website you wish to allow to connect
-        res.setHeader('Access-Control-Allow-Origin', process.env.URL_ALLOWED);
+        const allowedOrigins = process.env.URLS_ALLOWED;
+        const origin = req.headers.origin;
+        if (allowedOrigins.includes(origin)) {
+            res.setHeader('Access-Control-Allow-Origin', origin);
+        }
 
         // Request methods you wish to allow
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

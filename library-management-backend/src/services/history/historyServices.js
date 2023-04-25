@@ -4,23 +4,26 @@ import passwordUtils from "../../utils/passwordUtils";
 import jwtUtils from "../../utils/jwtUtils";
 import { Op } from "sequelize";
 import dotenv from 'dotenv';
-import { dateFormat, getCurrentDate, logData } from "../../utils/myUtils";
+import { addDays, dateFormat, getCurrentDate, logData } from "../../utils/myUtils";
 import categoryServices from "../category/categoryServices";
 import _ from 'lodash';
 import { decode } from "jsonwebtoken";
 import bookServices from "../book/bookServices";
 dotenv.config();
 
-const getAllHistories = async () => {
+const getAllHistories = async (req) => {
     try {
+        const { by } = req.query;
+
         let data = await db.History.findAll({
+            where: by && req.user ? { [by]: req.user?.id } : {},
             attributes: [
-                'id', 'quantityBorrowed', 'timeStart', 'timeEnd', 'createdAt', 'quantityBookLost'
+                'id', 'quantityBorrowed', 'timeStart', 'timeEnd', 'createdAt', 'quantityBookLost', 'isReturned'
             ],
             include: [
                 {
                     model: db.Book,
-                    attributes: ['id', 'name', 'price', 'quantity', 'quantityReality', 'borrowed'],
+                    attributes: ['id', 'name', 'author', 'price', 'quantity', 'quantityReality', 'borrowed'],
                 },
                 {
                     model: db.Student,
@@ -52,35 +55,15 @@ const getAllHistories = async () => {
     }
 }
 
-const getHistoryByStudentId = async (studentId) => {
+const getHistoriesWithPagination = async (page, limit, time, params) => {
     try {
-        let data = await db.History.findAll({
-            where: {
-                [Op.and]: [
-                    { studentId },
-                    { timeEnd: null },
-                ]
-            },
-            attributes: ['id', 'quantityBorrowed'],
-            raw: true,
-            nest: true
-        })
+        const { timeStart } = params;
 
-
-        return apiUtils.resFormat(0, "Get history by studentId successful !", data);
-
-    } catch (error) {
-        console.log(error);
-        return apiUtils.resFormat();
-    }
-}
-
-const getHistoriesWithPagination = async (page, limit, time) => {
-    try {
         let offset = (page - 1) * limit;
         let { count, rows } = await db.History.findAndCountAll({
+            where: timeStart ? { timeStart: JSON.parse(timeStart) } : {},
             attributes: [
-                'id', 'quantityBorrowed', 'timeStart', 'timeEnd', 'createdAt', 'quantityBookLost'
+                'id', 'quantityBorrowed', 'timeStart', 'timeEnd', 'createdAt', 'quantityBookLost', 'isReturned'
             ],
             include: [
                 {
@@ -135,13 +118,20 @@ const upsertHistory = async (history) => {
     try {
         // Check maximum book can borrowed
         let studentId = history.studentId;
-        let dataHistories = await getHistoryByStudentId(studentId);
-        if (dataHistories.DT.length >= process.env.MAX_BOOKS_CAN_BORROW
+        let dataHistories = await getHistoryBy({ studentId, timeEnd: null });
+
+        const bookBorrowed = history.dataBorrowed.reduce((acc, cur) => {
+            return acc + cur.quantityBookBorrowed;
+        }, 0)
+
+        if (bookBorrowed > process.env.MAX_BOOKS_CAN_BORROW
+            ||
+            dataHistories.DT.length >= process.env.MAX_BOOKS_CAN_BORROW
             ||
             dataHistories.DT.some((item) => +item.quantityBorrowed >= process.env.MAX_BOOKS_CAN_BORROW)
             ||
             (dataHistories.DT.length === 1 && +dataHistories.DT[0].quantityBorrowed === 1 && history.dataBorrowed.length === 1 && history.dataBorrowed[0].quantityBookBorrowed === 2)) {
-            return apiUtils.resFormat(1, `Create history failed !`);
+            return apiUtils.resFormat(1, `Max books can borrowed !`);
         }
 
 
@@ -159,7 +149,8 @@ const upsertHistory = async (history) => {
                 studentId,
                 bookId: book.bookIdBorrowed,
                 quantityBorrowed: book.quantityBookBorrowed,
-                quantityBookLost: '0'
+                quantityBookLost: 0,
+                isReturned: 0,
             })
         }
 
@@ -205,22 +196,53 @@ const deleteMultiplesHistory = async ({ listHistories }) => {
 
 const updateTimeApprove = async (history) => {
     try {
-        const { id, bookId, newBorrowed, timeStart, quantityGive, quantityBorrowedUpdate, studentId } = history;
+        const { id, bookId, studentId, newBorrowed, quantityBookLost, quantityBookGive, quantityBorrowedNew, timeStart, timeEnd } = history;
 
-        // Mượn 2 cuốn similar nhưng muốn give back trước 1 cuốn
-        if (quantityBorrowedUpdate > 0) {
-            // Ko update timeEnd, chỉ update quantityBorrowed
-            await updateAHistory({
-                quantityBorrowed: quantityBorrowedUpdate
-            }, id)
+        if (quantityBookGive || quantityBookLost) {
+            if (quantityBookGive) {
+                await updateAHistory({
+                    quantityBorrowed: quantityBookGive,
+                    id,
+                    timeEnd: getCurrentDate(),
+                    isReturned: 1
+                })
+            }
 
-            await db.History.create({
-                studentId,
-                bookId,
-                quantityBorrowed: quantityGive,
-                timeStart,
-                quantityBookLost: '0'
-            })
+            if (quantityBookLost) {
+                await updateAHistory({
+                    quantityBorrowed: quantityBookLost,
+                    quantityBookLost,
+                    id,
+                    timeEnd: getCurrentDate(),
+                    isReturned: 1
+                })
+                const dataBook = await bookServices.getBooksBy({ id: bookId });
+                if (dataBook.EC === 0) {
+                    await bookServices.upsertBook({
+                        id: bookId,
+                        quantityReality: dataBook.DT[0].quantityReality - quantityBookLost
+                    })
+                }
+            }
+
+            if (quantityBorrowedNew > 0) {
+                await db.History.create({
+                    studentId,
+                    bookId,
+                    quantityBorrowed: quantityBorrowedNew,
+                    timeStart,
+                    timeEnd,
+                    quantityBookLost: 0,
+                    isReturned: 0
+                })
+            }
+
+            await bookServices.upsertBook({
+                id: bookId,
+                borrowed: newBorrowed
+            });
+
+            return apiUtils.resFormat(0, `Update history successful !`);
         }
 
         if (!id) {
@@ -238,26 +260,21 @@ const updateTimeApprove = async (history) => {
             return apiUtils.resFormat(0, `Update all timeStart history successful !`);
         }
 
-        // Nếu có timeStart rồi thì update timeEnd, còn ko thì update timeStart
         await db.History.update({
-            [timeStart ? 'timeEnd' : 'timeStart']: getCurrentDate(),
+            timeStart: getCurrentDate(),
+            timeEnd: addDays(new Date(), +process.env.MAX_DAYS_TO_BORROW_BOOKS)
         }, {
             where: { id }
         })
 
-        await bookServices.updateABook({
-            borrowed: newBorrowed
-        }, bookId);
-
-
-        return apiUtils.resFormat(0, `Update ${timeStart ? 'timeEnd' : 'timeStart'} history successful !`);
+        return apiUtils.resFormat(0, `Update history successful !`);
     } catch (error) {
         console.log(error);
         return apiUtils.resFormat();
     }
 }
 
-const updateAHistory = async (newData, id) => {
+const updateAHistory = async ({ id, ...newData }) => {
     try {
         await db.History.update({
             ...newData
@@ -293,6 +310,5 @@ const getHistoryBy = async (condition) => {
 
 export default {
     getAllHistories, upsertHistory, deleteMultiplesHistory,
-    getHistoriesWithPagination, getHistoryByStudentId,
-    updateTimeApprove, updateAHistory, getHistoryBy
+    getHistoriesWithPagination, updateTimeApprove, updateAHistory, getHistoryBy
 }

@@ -10,7 +10,8 @@ module.exports = {
       quantityBorrowed: '2',
       timeStart: null,
       timeEnd: null,
-      quantityBookLost: '0',
+      quantityBookLost: 0,
+      isReturned: 0,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -20,7 +21,8 @@ module.exports = {
       quantityBorrowed: '1',
       timeStart: null,
       timeEnd: null,
-      quantityBookLost: '0',
+      quantityBookLost: 0,
+      isReturned: 0,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -30,7 +32,8 @@ module.exports = {
       quantityBorrowed: '1',
       timeStart: null,
       timeEnd: null,
-      quantityBookLost: '0',
+      quantityBookLost: 0,
+      isReturned: 0,
       createdAt: new Date(),
       updatedAt: new Date()
     },

@@ -6,19 +6,19 @@ module.exports = {
     // npx sequelize-cli db:seed:all
     return queryInterface.bulkInsert('Category', [{
       name: 'Tài liệu',
-      isBorrowed: 1,
+      isBorrowed: 0,
       createdAt: new Date(),
       updatedAt: new Date()
     },
     {
       name: 'Đồ án',
-      isBorrowed: 0,
+      isBorrowed: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     },
     {
       name: 'Báo cáo',
-      isBorrowed: 0,
+      isBorrowed: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     },

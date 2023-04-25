@@ -26,6 +26,9 @@ const delay = async (time = 500) => {
 const convertPathAPI = (pathAPI, method, removeAllAfterSlashIndex) => {
     const newPath = removeAllAfterSlashIndex ? pathAPI.split('/').splice(2).splice(0, removeAllAfterSlashIndex - 1) : pathAPI.split('/').splice(2).splice(0);
 
+    console.log(">>> here", pathAPI);
+
+
     switch (method) {
         case 'GET':
             method = 'read';
@@ -42,9 +45,6 @@ const convertPathAPI = (pathAPI, method, removeAllAfterSlashIndex) => {
         default:
             break;
     }
-
-
-
 
     if (method)
         return `/${newPath.join("/")}/${method}`;

@@ -9,10 +9,17 @@ const extractToken = (req) => {
     return null;
 }
 
-const nonSecurePaths = ['/login', '/logout', '/forget', '/books', '/categories', '/departments', '/majors', '/register'];
+const nonSecureAuthPaths = ['/login', '/logout', '/forget', '/register'];
+const nonSecurePaths = ['/books', '/categories', '/departments', '/majors'];
+
 const checkUserJWT = (req, res, next) => {
-    const newPathAPI = apiUtils.convertPathAPI(req.path, '', 2);
-    if (newPathAPI === '/login' || newPathAPI === '/register' || newPathAPI === '/logout' || newPathAPI === '/forget' || nonSecurePaths.includes(newPathAPI) && req.method === 'GET')
+    if (nonSecureAuthPaths.includes(req.path))
+        return next();
+
+    // const newPathAPI = apiUtils.convertPathAPI(req.path, '', 2);
+    console.log(">>> Check path", req.path);
+
+    if (nonSecurePaths.includes(req.path) && req.method === 'GET')
         return next();
 
     const tokenFromHeader = extractToken(req);
@@ -39,8 +46,11 @@ const checkUserJWT = (req, res, next) => {
 }
 
 const checkUserPermission = (req, res, next) => {
-    const newPathAPI = apiUtils.convertPathAPI(req.path, '', 2);
-    if (newPathAPI === '/login' || newPathAPI === '/register' || newPathAPI === '/logout' || newPathAPI === '/forget' || nonSecurePaths.includes(newPathAPI) && req.method === 'GET')
+    if (nonSecureAuthPaths.includes(req.path))
+        return next();
+
+    // const newPathAPI = apiUtils.convertPathAPI(req.path, '', 2);
+    if (nonSecurePaths.includes(req.path) && req.method === 'GET')
         return next();
 
     if (req.user) {
