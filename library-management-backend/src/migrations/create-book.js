@@ -31,7 +31,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       image: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT('long')
       },
       statusId: {
         type: Sequelize.INTEGER

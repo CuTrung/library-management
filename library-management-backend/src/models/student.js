@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Student.belongsToMany(models.Book, { through: 'History', foreignKey: 'studentId' });
 
       Student.hasMany(models.History, { foreignKey: 'studentId' })
+      Student.hasMany(models.Group)
     }
   }
   Student.init({

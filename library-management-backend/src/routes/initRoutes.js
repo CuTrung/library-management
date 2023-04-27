@@ -16,6 +16,7 @@ const initRoutes = (app) => {
 
     apiRoutes.departmentRoutes(router);
     apiRoutes.majorRoutes(router);
+    apiRoutes.otherRoutes(router);
 
     return app.use("/api/v1", router);
 }

@@ -65,8 +65,21 @@ const deleteAGroupRole = async (req, res) => {
     }
 }
 
+const updateGroupStudent = async (req, res) => {
+    try {
+        let data = await groupRoleServices.updateGroupStudent(req.body);
+        if (data.EC === 0 || data.EC === 1)
+            return apiUtils.resStatusJson(res, 200, data);
+
+        return apiUtils.resStatusJson(res, 500, data);
+    } catch (error) {
+        console.log(error);
+        return apiUtils.resStatusJson(res, 500, apiUtils.resFormat());
+    }
+}
+
 
 
 export default {
-    getGroupRoles, upsertGroupRole, deleteAGroupRole, getRoles
+    getGroupRoles, upsertGroupRole, deleteAGroupRole, getRoles, updateGroupStudent
 }

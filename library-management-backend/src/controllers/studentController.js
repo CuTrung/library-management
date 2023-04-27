@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import studentServices from "../services/student/studentServices";
 import apiUtils from '../utils/apiUtils';
 
@@ -12,7 +13,11 @@ const getStudents = async (req, res) => {
 
             return apiUtils.resStatusJson(res, 500, data);
         } else {
-            let data = await studentServices.getAllStudents();
+            let data = await studentServices.getAllStudents({
+                email: {
+                    [Op.notLike]: process.env.EMAIL_ADMIN
+                }
+            });
             if (data.EC === 0 || data.EC === 1)
                 return apiUtils.resStatusJson(res, 200, data);
 

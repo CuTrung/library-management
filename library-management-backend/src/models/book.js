@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     borrowed: DataTypes.INTEGER,
     quantity: DataTypes.INTEGER,
     quantityReality: DataTypes.INTEGER,
-    image: DataTypes.TEXT,
+    image: DataTypes.TEXT('long'),
     statusId: DataTypes.INTEGER,
   }, {
     sequelize,

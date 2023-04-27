@@ -6,9 +6,10 @@ import dotenv from 'dotenv';
 import { logData } from "../../utils/myUtils";
 dotenv.config();
 
-const getAllStudents = async () => {
+const getAllStudents = async (condition) => {
     try {
         let dataStudents = await db.Student.findAll({
+            where: { ...condition },
             attributes: [
                 'id', 'fullName', 'email',
                 'password', 'classRoom', 'isDeleted'
@@ -177,8 +178,26 @@ const deleteAStudent = async (id) => {
     }
 }
 
+const getStudentsBy = async (condition) => {
+    try {
+        let data = await db.Student.findAll({
+            where: { ...condition },
+            attributes: [
+                'id', 'fullName', 'email', 'classRoom', 'groupId', 'isDeleted'
+            ],
+            raw: true,
+            nest: true
+        })
+
+        return apiUtils.resFormat(0, `Find student by ${Object.keys(condition)} successful !`, data);
+    } catch (error) {
+        console.log(error);
+        return apiUtils.resFormat();
+    }
+}
+
 export default {
     getAllStudents, upsertStudent, deleteAStudent,
-    getStudentsWithPagination, getStudentByEmail,
+    getStudentsWithPagination, getStudentByEmail, getStudentsBy
 
 }

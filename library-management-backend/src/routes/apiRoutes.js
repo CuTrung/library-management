@@ -7,6 +7,7 @@ import historyController from "../controllers/historyController";
 import groupRoleController from "../controllers/groupRoleController";
 import majorController from "../controllers/majorController";
 import departmentController from "../controllers/departmentController";
+import otherController from "../controllers/otherController";
 
 
 const handleUserRoutes = (router) => {
@@ -37,7 +38,7 @@ const categoryRoutes = (router) => {
 }
 
 const studentRoutes = (router) => {
-    // router.get("/students", studentController.getStudents);
+    router.get("/students", studentController.getStudents);
     // router.post("/students", studentController.upsertStudent);
     // router.delete("/students", studentController.deleteAStudent);
 }
@@ -51,10 +52,12 @@ const historyRoutes = (router) => {
 }
 
 const groupRoleRoutes = (router) => {
-    router.get("/groupRoles", groupRoleController.getGroupRoles);
-    router.get("/groupRoles/roles", groupRoleController.getRoles);
-    router.post("/groupRoles", groupRoleController.upsertGroupRole);
-    router.delete("/groupRoles", groupRoleController.deleteAGroupRole);
+    router.get("/group-roles", groupRoleController.getGroupRoles);
+    router.get("/group-roles/roles", groupRoleController.getRoles);
+    router.post("/group-roles", groupRoleController.upsertGroupRole);
+    router.post("/group-roles/users", groupRoleController.updateGroupStudent);
+    router.delete("/group-roles", groupRoleController.deleteAGroupRole);
+
 }
 
 const departmentRoutes = (router) => {
@@ -69,8 +72,12 @@ const majorRoutes = (router) => {
     router.delete("/majors", majorController.deleteAMajor);
 }
 
+const otherRoutes = (router) => {
+    router.get("/tables", otherController.getAllTableNames);
+}
+
 
 export default {
     bookRoutes, statusRoutes, categoryRoutes, handleUserRoutes, studentRoutes, historyRoutes, groupRoleRoutes, departmentRoutes,
-    majorRoutes,
+    majorRoutes, otherRoutes
 }

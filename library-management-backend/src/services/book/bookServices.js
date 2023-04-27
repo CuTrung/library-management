@@ -35,7 +35,7 @@ const getAllBooks = async (params) => {
                 },
                 {
                     model: db.Major,
-                    attributes: ['id', 'name', 'description'],
+                    attributes: ['id', 'name', 'description', 'departmentId'],
                     through: { attributes: [] }
                 },
             ],
@@ -111,8 +111,8 @@ const getBooksWithPagination = async (page, limit, time, params) => {
                 },
                 {
                     model: db.Major,
-                    attributes: ['id', 'name', 'description'],
-                    through: { attributes: [] }
+                    attributes: ['id', 'name', 'description', 'departmentId'],
+                    through: { attributes: [] },
                 },
             ],
             order: [['id', 'DESC']],
