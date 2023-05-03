@@ -187,7 +187,7 @@ const deleteMultiplesHistory = async ({ listHistories }) => {
             }
         }
 
-        return apiUtils.resFormat(0, "Delete a history successful !", data);
+        return apiUtils.resFormat(0, "Delete multiples history successful !", data);
     } catch (error) {
         console.log(error);
         return apiUtils.resFormat();
